@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
 
 class comment_post extends StatefulWidget {
   String post_id;
@@ -15,13 +16,29 @@ class comment_post extends StatefulWidget {
 }
 
 class _comment_postState extends State<comment_post> {
-  var image = "https://images.unsplash.com/photo-1669172459261-d52881af17ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=500&q=60";
   var _firestore = FirebaseFirestore.instance;
   var _auth = FirebaseAuth.instance;
   TextEditingController comment = new TextEditingController();
   ScrollController sc = new ScrollController();
+  bool isload = false;
+  String? image;
+  image_get_user() async {
+    setState(() {
+      isload = true;
+    });
+    await _firestore.collection("users").doc(_auth.currentUser!.uid).get().then((value) {
+      setState(() {});
+      image = value["image"];
+    });
+    setState(() {
+      isload = false;
+    });
+    return image!;
+  }
+
   String post_id;
   _comment_postState(this.post_id);
+
   void scrolltobottom() async {
     await sc.animateTo(
       sc.position.maxScrollExtent,
@@ -44,6 +61,7 @@ class _comment_postState extends State<comment_post> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    image_get_user();
     print(post_id);
   }
 
@@ -87,92 +105,125 @@ class _comment_postState extends State<comment_post> {
                   color: Colors.black38,
                 ),
                 Expanded(
-                    child: Container(
-                  // height: rang.size.height - (rang.viewInsets.bottom + rang.size.height / 8),
-                  child: StreamBuilder(
-                    stream: _firestore.collection("comment").doc(post_id).collection("comment").orderBy("time", descending: false).snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          controller: sc,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            return StreamBuilder(
-                              stream: _firestore.collection("users").doc(snapshot.data!.docs[index]["uid"]).snapshots(),
-                              builder: (context, snap) {
-                                if (snap.hasData) {
-                                  return Container(
-                                      padding: EdgeInsets.all(10),
-                                      width: size.width,
-                                      // color: Colors.blue,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Flexible(
-                                                  flex: 1,
-                                                  child: CircleAvatar(
-                                                    radius: 23,
-                                                    backgroundImage: NetworkImage(snap.data!["image"]),
-                                                  ),
-                                                ),
-                                                Flexible(
-                                                  flex: 4,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(left: 10),
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Container(
-                                                          child: Text(
-                                                            snap.data!["firstname"],
-                                                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    child: isload
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Container(
+                            // height: rang.size.height - (rang.viewInsets.bottom + rang.size.height / 8),
+                            child: StreamBuilder(
+                              stream: _firestore.collection("comment").doc(post_id).collection("comment").orderBy("time", descending: false).snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return ListView.builder(
+                                    controller: sc,
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      final Timestamp timestamp = snapshot.data!.docs[index]["time"] as Timestamp;
+                                      final DateTime dateTime = timestamp.toDate();
+                                      final dateString = DateFormat('kk:mm a').format(dateTime);
+                                      getTime(time) {
+                                        if (DateTime.now().difference(time).inMinutes < 2) {
+                                          return "Now";
+                                        } else if (DateTime.now().difference(time).inMinutes < 60) {
+                                          return "${DateTime.now().difference(time).inHours} min";
+                                        } else if (DateTime.now().difference(time).inMinutes < 1440) {
+                                          return "${DateTime.now().difference(time).inHours} hours";
+                                        } else if (DateTime.now().difference(time).inMinutes > 1440) {
+                                          return "${DateTime.now().difference(time).inDays} days";
+                                        }
+                                      }
+
+                                      var diff_time = getTime(dateTime);
+
+                                      return StreamBuilder(
+                                        stream: _firestore.collection("users").doc(snapshot.data!.docs[index]["uid"]).snapshots(),
+                                        builder: (context, snap) {
+                                          if (snap.hasData) {
+                                            return Container(
+                                                padding: EdgeInsets.all(10),
+                                                width: size.width,
+                                                // color: Colors.blue,
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Flexible(
+                                                            flex: 1,
+                                                            child: CircleAvatar(
+                                                              radius: 23,
+                                                              backgroundImage: NetworkImage(snap.data!["image"]),
+                                                            ),
                                                           ),
-                                                        ),
-                                                        Container(
-                                                          padding: EdgeInsets.only(top: 5),
-                                                          // width: size.width / 1.3,
-                                                          //  color: Colors.redAccent,
-                                                          child: Text(
-                                                            snapshot.data!.docs[index]["comment"],
-                                                            style: TextStyle(fontSize: 13),
+                                                          Flexible(
+                                                            flex: 4,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 10),
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        child: Text(
+                                                                          snap.data!["firstname"],
+                                                                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(child: Container()),
+                                                                      Text(
+                                                                        "$diff_time",
+                                                                        style: TextStyle(fontSize: 13, color: Colors.black54),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                  Container(
+                                                                    padding: EdgeInsets.only(top: 5),
+                                                                    // width: size.width / 1.3,
+                                                                    //  color: Colors.redAccent,
+                                                                    child: Text(
+                                                                      snapshot.data!.docs[index]["comment"],
+                                                                      style: TextStyle(fontSize: 13),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Divider(
-                                            indent: 5,
-                                            thickness: 2,
-                                          ),
-                                          Padding(padding: EdgeInsets.all(4)),
-                                        ],
-                                      ));
+                                                    Divider(
+                                                      indent: 5,
+                                                      thickness: 2,
+                                                    ),
+                                                    // Padding(padding: EdgeInsets.all(4)),
+                                                  ],
+                                                ));
+                                          } else {
+                                            return Container();
+                                          }
+                                        },
+                                      );
+                                    },
+                                  );
                                 } else {
-                                  return Container();
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
                                 }
                               },
-                            );
-                          },
-                        );
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    },
-                  ),
-                )),
+                            ),
+                          )),
                 Container(
                   height: size.height / 10,
                   width: size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   child: Container(
                     child: Center(
                       child: Row(
@@ -182,7 +233,7 @@ class _comment_postState extends State<comment_post> {
                             flex: 1,
                             child: CircleAvatar(
                               radius: 20,
-                              backgroundColor: Colors.redAccent,
+                              backgroundColor: Colors.cyanAccent,
                             ),
                           ),
                           Padding(padding: EdgeInsets.all(10)),
@@ -195,7 +246,9 @@ class _comment_postState extends State<comment_post> {
                                 decoration: InputDecoration(
                                     suffixIcon: TextButton(
                                       onPressed: () {
-                                        add_post();
+                                        if (comment.text != "") {
+                                          add_post();
+                                        }
                                       },
                                       child: Text("POST"),
                                     ),
@@ -214,70 +267,4 @@ class _comment_postState extends State<comment_post> {
       ),
     );
   }
-}
-
-Widget _buildCommentBox(Size size, TextEditingController comment) {
-  return Container(
-    color: Colors.white,
-    child: Padding(
-      padding: const EdgeInsets.all(30.0),
-      child: Container(
-        height: size.height / 10,
-        // margin: EdgeInsets.only(bottom: 20),
-        width: size.width,
-        //color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              flex: 1,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.amber,
-              ),
-            ),
-            Padding(padding: EdgeInsets.only(right: 10)),
-            Flexible(
-                flex: 6,
-                child: Container(
-                  child: TextField(
-                    controller: comment,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        isCollapsed: true,
-                        contentPadding: EdgeInsets.all(10),
-                        hintText: "Add Comments...",
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(
-                              color: Color.fromARGB(221, 7, 48, 19),
-                              width: 1,
-                            )),
-                        border: OutlineInputBorder(borderSide: BorderSide(strokeAlign: StrokeAlign.inside), borderRadius: BorderRadius.circular(20)),
-                        suffixIcon: TextButton(
-                          onPressed: () async {
-                            var coid = Uuid().v1();
-                            await FirebaseFirestore.instance.collection("comment").doc("df3c970-6f04-11ed-bf42-035f5c778b21").collection("comment").doc(coid).set({
-                              "time": DateTime.now(),
-                              "uid": FirebaseAuth.instance.currentUser!.uid,
-                              "comment": comment.text,
-                            }).then((value) {
-                              print("comment is done !!");
-                              comment.clear();
-                            });
-                          },
-                          child: Text(
-                            "POST",
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        )),
-                  ),
-                ))
-          ],
-        ),
-      ),
-    ),
-  );
 }

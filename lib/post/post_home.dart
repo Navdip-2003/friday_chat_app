@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lottie/lottie.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 
 class post_home extends StatefulWidget {
   const post_home({super.key});
@@ -58,7 +59,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   List post_show = [];
   void get_post() async {
     isload = true;
-    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").get().then((value) {
+    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).get().then((value) {
       value.docs.forEach((element) {
         print(element.data());
         post_show.add(element.data());
@@ -143,26 +144,37 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                   bool jj = snapshot.data!["like"][_auth.currentUser!.uid] == null ? false : snapshot.data!["like"][_auth.currentUser!.uid];
                                   Map<String, dynamic> tot = snapshot.data!["like"];
                                   print(tot.keys.first);
-                                  // String like_person = snapshot.data!["like"][0] == null ? "null" : snapshot.data!["like"][0];
-                                  // print(like_person);
                                   tot.forEach((key, value) {
                                     if (value == true) {
                                       tot_like += 1;
                                     }
                                   });
                                   int total_like_cout = tot_like - 1;
+                                  final Timestamp timestamp = post_show[index]["time"] as Timestamp;
+                                  final DateTime dateTime = timestamp.toDate();
+                                  final dateString = DateFormat('kk:mm a').format(dateTime);
+                                  getTime(time) {
+                                    if (DateTime.now().difference(time).inMinutes < 2) {
+                                      return "Now";
+                                    } else if (DateTime.now().difference(time).inMinutes < 60) {
+                                      return "${DateTime.now().difference(time).inHours} min";
+                                    } else if (DateTime.now().difference(time).inMinutes < 1440) {
+                                      return "${DateTime.now().difference(time).inHours} hours";
+                                    } else if (DateTime.now().difference(time).inMinutes > 1440) {
+                                      return "${DateTime.now().difference(time).inDays} days";
+                                    }
+                                  }
+
+                                  var diff_time = getTime(dateTime);
                                   return StreamBuilder(
                                     stream: _firestore.collection("users").doc(post_show[index]["uid"]).snapshots(),
                                     builder: (context, snap) {
                                       if (snap.hasData) {
                                         return Card(
-                                          color: Color.fromARGB(255, 200, 200, 200),
+                                          //color: Color.fromARGB(255, 200, 200, 200),
                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
                                           child: Container(
-                                            // color: Color.fromARGB(255, 246, 179, 159),
                                             child: Container(
-                                              // height: size.height / 1.5,
-                                              // color: Color.fromARGB(255, 90, 246, 75),
                                               width: size.width,
                                               child: Column(
                                                 children: [
@@ -187,17 +199,27 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                                 width: size.width / 2,
                                                                 child: Text(snap.data!["firstname"], style: TextStyle(fontFamily: "SansFont", fontWeight: FontWeight.w900, overflow: TextOverflow.ellipsis, fontSize: 15)),
                                                               ),
-                                                              Container(
-                                                                width: size.width / 1.8,
-                                                                child: Text(
-                                                                  snapshot.data!["location"],
-                                                                  style: TextStyle(fontFamily: "SansFont", fontSize: 10, overflow: TextOverflow.ellipsis),
-                                                                ),
+                                                              Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons.location_on,
+                                                                    size: 15,
+                                                                  ),
+                                                                  Padding(padding: EdgeInsets.only(right: 3)),
+                                                                  Container(
+                                                                    width: size.width / 1.8,
+                                                                    child: Text(
+                                                                      snapshot.data!["location"],
+                                                                      style: TextStyle(fontFamily: "SansFont", fontSize: 10, overflow: TextOverflow.ellipsis),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ],
                                                           ),
                                                         ),
-                                                        Expanded(child: Icon(Icons.vertical_distribute_outlined))
+                                                        Expanded(child: Container()),
+                                                        Text("$diff_time")
                                                       ],
                                                     ),
                                                   ),
@@ -210,30 +232,14 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                       placeholder: (context, url) => Center(child: Lottie.asset("asset/image_loading.json", width: size.width / 7, height: size.height)),
                                                       errorWidget: (context, url, error) => Icon(Icons.error),
                                                     ),
-                                                    // Image.network(
-                                                    //   snapshot.data!["post"],
-                                                    //   // snapshot.data!["post"],
-                                                    //   fit: BoxFit.cover,
-                                                    //   frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                                                    //     return child;
-                                                    //   },
-                                                    //   loadingBuilder: (context, child, loadingProgress) {
-                                                    //     if (loadingProgress == null) {
-                                                    //       return child;
-                                                    //     } else {
-                                                    //       return Center(
-                                                    //         child: CircularProgressIndicator(),
-                                                    //       );
-                                                    //     }
-                                                    //   },
-                                                    // ),
                                                   ),
                                                   Container(
                                                     padding: EdgeInsets.only(right: 10, left: 10, top: 5, bottom: 5),
                                                     child: Row(
                                                       children: [
                                                         LikeButton(
-                                                          // countBuilder: null,
+                                                          likeCount: tot_like,
+                                                          countBuilder: (likeCount, isLiked, text) {},
                                                           likeBuilder: (isLiked) {
                                                             if (jj == false) {
                                                               return Icon(
@@ -298,7 +304,9 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           width: size.width / 25,
                                                         ),
                                                         InkWell(
-                                                            onTap: () {},
+                                                            onTap: () {
+                                                              Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: post_show[index]["post_id"])));
+                                                            },
                                                             child: Image.asset(
                                                               "asset/comment.png",
                                                               scale: 23,
@@ -343,22 +351,22 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                       ],
                                                     ),
                                                   ),
-                                                  tot_like == 0
-                                                      ? Container()
-                                                      : Container(
-                                                          padding: EdgeInsets.only(right: 10, left: 10),
-                                                          width: size.width,
-                                                          color: Color.fromARGB(255, 109, 137, 250),
-                                                          child: tot_like == 1
-                                                              ? Text(
-                                                                  "Liked are 1 others",
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                )
-                                                              : Text(
-                                                                  "Total Likes are  $tot_like and  others",
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                        ),
+                                                  // tot_like == 0
+                                                  //     ? Container()
+                                                  //     : Container(
+                                                  //         padding: EdgeInsets.only(right: 10, left: 10),
+                                                  //         width: size.width,
+                                                  //         color: Color.fromARGB(255, 109, 137, 250),
+                                                  //         child: tot_like == 1
+                                                  //             ? Text(
+                                                  //                 "Liked are 1 others",
+                                                  //                 overflow: TextOverflow.ellipsis,
+                                                  //               )
+                                                  //             : Text(
+                                                  //                 "Total Likes are  $tot_like and  others",
+                                                  //                 overflow: TextOverflow.ellipsis,
+                                                  //               ),
+                                                  //       ),
                                                   Container(
                                                     padding: EdgeInsets.all(10),
                                                     width: size.width,
