@@ -55,9 +55,9 @@ Future main() async {
       title: "FriDay_Chat",
       home:
           //demoty()
-          demo2()
-      //splash()
-      //use == null ? login() : navigation()
+          //demo2()
+          splash()
+      // use == null ? login() : navigation()
 
       ));
 }
