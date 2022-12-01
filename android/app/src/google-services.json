@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "738987421889",
+    "project_id": "chat-data-f147e",
+    "storage_bucket": "chat-data-f147e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738987421889:android:0704032a5d43a2c6096440",
+        "android_client_info": {
+          "package_name": "com.example.friday_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738987421889-omn98bk84257utd1gs4f1o2bo5reri87.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG2-qz7-BZnvr9jGjd1BFIJALZO2Tsu3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738987421889-omn98bk84257utd1gs4f1o2bo5reri87.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
