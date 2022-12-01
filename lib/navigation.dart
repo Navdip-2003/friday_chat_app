@@ -73,7 +73,7 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
       body: pages[currentindex],
       bottomNavigationBar: BottomNavigationBar(
         key: bottom_key,
-        backgroundColor: Colors.amber,
+//backgroundColor: Colors.amber,
         showUnselectedLabels: false,
         currentIndex: currentindex,
         selectedItemColor: Colors.black,
