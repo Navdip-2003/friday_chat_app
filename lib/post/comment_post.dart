@@ -7,10 +7,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
 class comment_post extends StatefulWidget {
-  const comment_post({super.key});
+  String post_id;
+  comment_post({super.key, required this.post_id});
 
   @override
-  State<comment_post> createState() => _comment_postState();
+  State<comment_post> createState() => _comment_postState(post_id);
 }
 
 class _comment_postState extends State<comment_post> {
@@ -19,6 +20,8 @@ class _comment_postState extends State<comment_post> {
   var _auth = FirebaseAuth.instance;
   TextEditingController comment = new TextEditingController();
   ScrollController sc = new ScrollController();
+  String post_id;
+  _comment_postState(this.post_id);
   void scrolltobottom() async {
     await sc.animateTo(
       sc.position.maxScrollExtent,
@@ -28,10 +31,20 @@ class _comment_postState extends State<comment_post> {
     //canishowfab = false;
   }
 
+  void add_post() async {
+    var coid = Uuid().v1();
+    await FirebaseFirestore.instance.collection("comment").doc(post_id).collection("comment").doc(coid).set({"time": DateTime.now(), "uid": FirebaseAuth.instance.currentUser!.uid, "comment": comment.text}).then((value) {
+      print("comment is done !!");
+      comment.clear();
+      scrolltobottom();
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    print(post_id);
   }
 
   @override
@@ -45,14 +58,6 @@ class _comment_postState extends State<comment_post> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: false,
-      // appBar: AppBar(
-      //   leading: BackButton(color: Colors.black,),
-      //   title: Text("Comments" , style: TextStyle(color: Colors.black , fontWeight: FontWeight.w600),),
-      //   elevation: 1,
-      //   backgroundColor: Color.fromARGB(0, 157, 157, 157),
-      //   //brightness: Brightness.dark,
-      // ),
-      // floatingActionButton: _buildCommentBox(size, comment),
       body: Hero(
         tag: "comment",
         child: Container(
@@ -83,69 +88,78 @@ class _comment_postState extends State<comment_post> {
                 ),
                 Expanded(
                     child: Container(
-                  height: rang.size.height - (rang.viewInsets.bottom + rang.size.height / 8),
+                  // height: rang.size.height - (rang.viewInsets.bottom + rang.size.height / 8),
                   child: StreamBuilder(
-                    stream: _firestore.collection("comment").doc("df3c970-6f04-11ed-bf42-035f5c778b21").collection("comment").snapshots(),
+                    stream: _firestore.collection("comment").doc(post_id).collection("comment").orderBy("time", descending: false).snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ListView.builder(
                           controller: sc,
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
-                            return Container(
-                                padding: EdgeInsets.all(10),
-                                width: size.width,
-                                // color: Colors.blue,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                            return StreamBuilder(
+                              stream: _firestore.collection("users").doc(snapshot.data!.docs[index]["uid"]).snapshots(),
+                              builder: (context, snap) {
+                                if (snap.hasData) {
+                                  return Container(
+                                      padding: EdgeInsets.all(10),
+                                      width: size.width,
+                                      // color: Colors.blue,
+                                      child: Column(
                                         children: [
-                                          Flexible(
-                                            flex: 1,
-                                            child: CircleAvatar(
-                                              radius: 23,
-                                              backgroundImage: NetworkImage(image),
+                                          Container(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: CircleAvatar(
+                                                    radius: 23,
+                                                    backgroundImage: NetworkImage(snap.data!["image"]),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  flex: 4,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Container(
+                                                          child: Text(
+                                                            snap.data!["firstname"],
+                                                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          padding: EdgeInsets.only(top: 5),
+                                                          // width: size.width / 1.3,
+                                                          //  color: Colors.redAccent,
+                                                          child: Text(
+                                                            snapshot.data!.docs[index]["comment"],
+                                                            style: TextStyle(fontSize: 13),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
                                             ),
                                           ),
-                                          Flexible(
-                                            flex: 4,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    child: Text(
-                                                      snapshot.data!.docs[index]["uid"],
-                                                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.only(top: 5),
-                                                    // width: size.width / 1.3,
-                                                    //  color: Colors.redAccent,
-                                                    child: Text(
-                                                      snapshot.data!.docs[index]["comment"],
-                                                      style: TextStyle(fontSize: 13),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
+                                          Divider(
+                                            indent: 5,
+                                            thickness: 2,
+                                          ),
+                                          Padding(padding: EdgeInsets.all(4)),
                                         ],
-                                      ),
-                                    ),
-                                    Divider(
-                                      indent: 5,
-                                      thickness: 2,
-                                    ),
-                                    Padding(padding: EdgeInsets.all(4)),
-                                  ],
-                                ));
+                                      ));
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            );
                           },
                         );
                       } else {
@@ -158,7 +172,6 @@ class _comment_postState extends State<comment_post> {
                 )),
                 Container(
                   height: size.height / 10,
-                  color: Colors.orange,
                   width: size.width,
                   child: Container(
                     child: Center(
@@ -176,7 +189,20 @@ class _comment_postState extends State<comment_post> {
                           Flexible(
                               flex: 2,
                               child: TextField(
-                                decoration: InputDecoration(isCollapsed: true, contentPadding: EdgeInsets.all(10), focusColor: Colors.white, hintText: "Add Comments ..."),
+                                controller: comment,
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
+                                decoration: InputDecoration(
+                                    suffixIcon: TextButton(
+                                      onPressed: () {
+                                        add_post();
+                                      },
+                                      child: Text("POST"),
+                                    ),
+                                    isCollapsed: true,
+                                    contentPadding: EdgeInsets.all(10),
+                                    focusColor: Colors.white,
+                                    hintText: "Add Comments ..."),
                               ))
                         ],
                       ),

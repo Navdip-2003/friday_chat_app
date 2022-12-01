@@ -372,7 +372,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                     width: size.width,
                                                     child: InkWell(
                                                       onTap: () {
-                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post()));
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: post_show[index]["post_id"])));
                                                       },
                                                       child: Row(
                                                         children: [
