@@ -6,6 +6,7 @@ import 'package:friday_chat_app/dispaly_homepage.dart';
 import 'package:friday_chat_app/home.dart';
 import 'package:friday_chat_app/navi_item/user_profile.dart';
 import 'package:friday_chat_app/pagination.dart';
+import 'package:friday_chat_app/post/pagination_comment.dart';
 import 'package:friday_chat_app/post/post_home.dart';
 import 'package:friday_chat_app/single_chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,7 +33,8 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
     contact(),
     //  homepage(),
     //demoty(),
-    pagination2(),
+    comment_pagination(),
+    // pagination2(),
     post_home(),
     profile()
   ];

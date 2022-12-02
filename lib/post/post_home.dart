@@ -34,8 +34,6 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   Map<String, dynamic>? like;
   void getlike() async {
     _firestore.collection("post").doc("6aBmHJnwWXhT3AQl9fjBW0uhYd52").collection("story").doc("vHe7VbbqzMWHc6eErcgw").get().then((value) {
-      //print(value.data());
-
       like = value["like"];
       like!.forEach((key, value) {
         if (value == true) {
@@ -43,12 +41,9 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
         }
       });
       print("tot like is : $dal");
-      // var ppd = like!.values.map((e) => like![e] == true).toList();
-      // print(ppd);
+
       final totlike = like?.keys.map((e) => like?[e] == true).toList();
-      // print(totlike);
-      // print(totlike!.length);
-      // print(like!["6aBmHJnwWXhT3AQl9fjBW0uhYd52"]);
+      //
       falco = like![_auth.currentUser!.uid] == null ? false : true;
       // print("falco is : $falco");
     });
@@ -70,12 +65,82 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
     });
   }
 
+  final GlobalKey<RefreshIndicatorState> ref_key = GlobalKey<RefreshIndicatorState>();
+  bool isloading = false;
+  bool more_pr = true;
+  bool get_pr = false;
+  ScrollController sc = ScrollController();
+  DocumentSnapshot? last_re;
+  List kl = [];
+  void show_data() async {
+    isloading = true;
+    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(3).get().then((value) {
+      if (kl.isNotEmpty) {
+        kl = value.docs;
+        last_re = value.docs[value.docs.length - 1];
+      }
+
+      // print(last_re!["time"]);
+
+      setState(() {
+        isloading = false;
+      });
+    });
+  }
+
+  void show() async {
+    print("more data afford in database !!");
+    if (!more_pr) {
+      print("no product available !!");
+      return;
+    }
+    if (get_pr) {
+      return;
+    }
+    setState(() {
+      get_pr = true;
+    });
+
+    await Future.delayed(Duration(seconds: 1));
+    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).startAfter([last_re!["time"]]).limit(2).get().then((value) {
+          if (value.docs.isEmpty) {
+            setState(() {
+              more_pr = true;
+              get_pr = false;
+              return;
+            });
+          } else {
+            kl.addAll(value.docs);
+            last_re = value.docs[value.docs.length - 1];
+            print(value.docs.length);
+            if (value.docs.length < 2) {
+              setState(() {
+                more_pr = false;
+              });
+            }
+            setState(() {
+              get_pr = false;
+            });
+          }
+        });
+  }
+
   late AnimationController cont;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    get_post();
+    //get_post();
+    show_data();
+    sc = ScrollController();
+    sc.addListener(() {
+      double maxscroll = sc.position.maxScrollExtent;
+      double cuscrll = sc.position.pixels;
+      double delta = MediaQuery.of(context).size.height * 0.25;
+      if (maxscroll - cuscrll <= delta) {
+        show();
+      }
+    });
     cont = AnimationController(duration: Duration(milliseconds: 750), vsync: this);
     // getlike();
   }
@@ -125,306 +190,324 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
               ),
             ),
             Expanded(
-                child: isload
-                    ? Center(
-                        child: Lottie.asset("asset/loading.json", width: size.width / 7, height: size.height),
-                      )
-                    : Container(
-                      width: size.width,
-                      child: ListView.builder(
-                        itemCount: post_show.length,
-                        itemBuilder: (context, index) {
-                          return StreamBuilder(
-                            stream: _firestore.collection("post").doc(post_show[index]["uid"]).collection("story").doc(post_show[index]["post_id"]).snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                int tot_like = 0;
-                                bool jj = snapshot.data!["like"][_auth.currentUser!.uid] == null ? false : snapshot.data!["like"][_auth.currentUser!.uid];
-                                Map<String, dynamic> tot = snapshot.data!["like"];
-                                print(tot.keys.first);
-                                tot.forEach((key, value) {
-                                  if (value == true) {
-                                    tot_like += 1;
-                                  }
-                                });
-                                int total_like_cout = tot_like - 1;
-                                final Timestamp timestamp = post_show[index]["time"] as Timestamp;
-                                final DateTime dateTime = timestamp.toDate();
-                                final dateString = DateFormat('kk:mm a').format(dateTime);
-                                getTime(time) {
-                                  if (DateTime.now().difference(time).inMinutes < 2) {
-                                    return "Now";
-                                  } else if (DateTime.now().difference(time).inMinutes < 60) {
-                                    return "${DateTime.now().difference(time).inHours} min";
-                                  } else if (DateTime.now().difference(time).inMinutes < 1440) {
-                                    return "${DateTime.now().difference(time).inHours} hours";
-                                  } else if (DateTime.now().difference(time).inMinutes > 1440) {
-                                    return "${DateTime.now().difference(time).inDays} days";
-                                  }
-                                }
+                child: Container(
+              child: isload
+                  ? Center(
+                      child: Lottie.asset("asset/loading.json", width: size.width / 7, height: size.height),
+                    )
+                  : RefreshIndicator(
+                      key: ref_key,
+                      onRefresh: () async {
+                        setState(() {
+                          show_data();
+                          more_pr = true;
+                          get_pr = false;
+                        });
+                      },
+                      child: Container(
+                        width: size.width,
+                        child: ListView.builder(
+                          controller: sc,
+                          itemCount: kl.length,
+                          itemBuilder: (context, index) {
+                            if (kl.isNotEmpty) {
+                              return StreamBuilder(
+                                stream: _firestore.collection("post").doc(kl[index]["uid"]).collection("story").doc(kl[index]["post_id"]).snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    int tot_like = 0;
+                                    bool jj = snapshot.data!["like"][_auth.currentUser!.uid] == null ? false : snapshot.data!["like"][_auth.currentUser!.uid];
+                                    Map<String, dynamic> tot = snapshot.data!["like"];
+                                    print(tot.keys.first);
+                                    tot.forEach((key, value) {
+                                      if (value == true) {
+                                        tot_like += 1;
+                                      }
+                                    });
+                                    int total_like_cout = tot_like - 1;
+                                    final Timestamp timestamp = kl[index]["time"] as Timestamp;
+                                    final DateTime dateTime = timestamp.toDate();
+                                    final dateString = DateFormat('kk:mm a').format(dateTime);
+                                    getTime(time) {
+                                      if (DateTime.now().difference(time).inMinutes < 2) {
+                                        return "Now";
+                                      } else if (DateTime.now().difference(time).inMinutes < 60) {
+                                        return "${DateTime.now().difference(time).inHours} min";
+                                      } else if (DateTime.now().difference(time).inMinutes < 1440) {
+                                        return "${DateTime.now().difference(time).inHours} hours";
+                                      } else if (DateTime.now().difference(time).inMinutes > 1440) {
+                                        return "${DateTime.now().difference(time).inDays} days";
+                                      }
+                                    }
 
-                                var diff_time = getTime(dateTime);
-                                return StreamBuilder(
-                                  stream: _firestore.collection("users").doc(post_show[index]["uid"]).snapshots(),
-                                  builder: (context, snap) {
-                                    if (snap.hasData) {
-                                      return Card(
-                                        //color: Color.fromARGB(255, 200, 200, 200),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-                                        child: Container(
-                                          child: Container(
-                                            width: size.width,
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.all(5),
-                                                  child: Row(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        radius: 26,
-                                                        foregroundColor: Color.fromARGB(255, 244, 119, 2),
-                                                        child: CircleAvatar(
-                                                          radius: 24,
-                                                          backgroundImage: NetworkImage(snap.data!["image"]),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Container(
-                                                              width: size.width / 2,
-                                                              child: Text(snap.data!["firstname"], style: TextStyle(fontFamily: "SansFont", fontWeight: FontWeight.w900, overflow: TextOverflow.ellipsis, fontSize: 15)),
+                                    var diff_time = getTime(dateTime);
+                                    return StreamBuilder(
+                                      stream: _firestore.collection("users").doc(kl[index]["uid"]).snapshots(),
+                                      builder: (context, snap) {
+                                        if (snap.hasData) {
+                                          return Card(
+                                            //color: Color.fromARGB(255, 200, 200, 200),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+                                            child: Container(
+                                              child: Container(
+                                                width: size.width,
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      padding: EdgeInsets.all(5),
+                                                      child: Row(
+                                                        children: [
+                                                          CircleAvatar(
+                                                            radius: 26,
+                                                            foregroundColor: Color.fromARGB(255, 244, 119, 2),
+                                                            child: CircleAvatar(
+                                                              radius: 24,
+                                                              backgroundImage: NetworkImage(snap.data!["image"]),
                                                             ),
-                                                            Row(
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                Icon(
-                                                                  Icons.location_on,
-                                                                  size: 15,
-                                                                ),
-                                                                Padding(padding: EdgeInsets.only(right: 3)),
                                                                 Container(
-                                                                  width: size.width / 1.8,
-                                                                  child: Text(
-                                                                    snapshot.data!["location"],
-                                                                    style: TextStyle(fontFamily: "SansFont", fontSize: 10, overflow: TextOverflow.ellipsis),
-                                                                  ),
+                                                                  width: size.width / 2,
+                                                                  child: Text(snap.data!["firstname"], style: TextStyle(fontFamily: "SansFont", fontWeight: FontWeight.w900, overflow: TextOverflow.ellipsis, fontSize: 15)),
+                                                                ),
+                                                                Row(
+                                                                  children: [
+                                                                    Icon(
+                                                                      Icons.location_on,
+                                                                      size: 15,
+                                                                    ),
+                                                                    Padding(padding: EdgeInsets.only(right: 3)),
+                                                                    Container(
+                                                                      width: size.width / 1.8,
+                                                                      child: Text(
+                                                                        snapshot.data!["location"],
+                                                                        style: TextStyle(fontFamily: "SansFont", fontSize: 10, overflow: TextOverflow.ellipsis),
+                                                                      ),
+                                                                    ),
+                                                                  ],
                                                                 ),
                                                               ],
                                                             ),
+                                                          ),
+                                                          Expanded(child: Container()),
+                                                          Text("$diff_time")
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    InkWell(
+                                                      onDoubleTap: () {
+                                                        if (jj == false) {
+                                                          setState(() {
+                                                            tot_like += 1;
+                                                            jj = true;
+                                                            _firestore.collection("post").doc(kl[index]["uid"]).collection("story").doc(kl[index]["post_id"]).update({'like.$cuu_id': true});
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        width: size.width,
+                                                        height: size.height / 2.2,
+                                                        child: CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl: snapshot.data!["post"],
+                                                          placeholder: (context, url) => Center(child: Lottie.asset("asset/image_loading.json", width: size.width / 7, height: size.height)),
+                                                          errorWidget: (context, url, error) => Icon(Icons.error),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding: EdgeInsets.only(right: 10, left: 10, top: 5, bottom: 5),
+                                                      child: Row(
+                                                        children: [
+                                                          LikeButton(
+                                                            likeCount: tot_like,
+                                                            countBuilder: (likeCount, isLiked, text) {},
+                                                            likeBuilder: (isLiked) {
+                                                              if (jj == false) {
+                                                                return Icon(
+                                                                  Icons.favorite,
+                                                                  color: Colors.grey,
+                                                                  size: 30,
+                                                                );
+                                                              } else {
+                                                                return Icon(
+                                                                  Icons.favorite,
+                                                                  color: Color.fromARGB(255, 198, 18, 1),
+                                                                  size: 30,
+                                                                );
+                                                              }
+                                                            },
+                                                            onTap: (kkr) async {
+                                                              if (jj == false) {
+                                                                setState(() {
+                                                                  tot_like += 1;
+                                                                  jj = true;
+
+                                                                  _firestore.collection("post").doc(kl[index]["uid"]).collection("story").doc(kl[index]["post_id"]).update({'like.$cuu_id': true});
+                                                                });
+
+                                                                return !kkr;
+                                                              } else {
+                                                                print("isnotliked!!");
+                                                                setState(() {
+                                                                  tot_like -= 1;
+                                                                  jj = false;
+                                                                  _firestore.collection("post").doc(kl[index]["uid"]).collection("story").doc(kl[index]["post_id"]).update({'like.$cuu_id': false});
+                                                                });
+                                                                return !kkr;
+                                                              }
+                                                            },
+                                                          ),
+
+                                                          // IconButton(
+                                                          //   onPressed: () async{
+                                                          //     if(jj == false){
+                                                          //       setState(() {
+                                                          //         jj = true;
+                                                          //         _firestore.collection("post").doc("6aBmHJnwWXhT3AQl9fjBW0uhYd52").collection("story").
+                                                          //           doc("vHe7VbbqzMWHc6eErcgw").update({
+                                                          //             'like.$cuu_id' : true
+                                                          //           });
+                                                          //       });
+                                                          //     }else{
+                                                          //       setState(() {
+                                                          //         jj = false;
+                                                          //         _firestore.collection("post").doc("6aBmHJnwWXhT3AQl9fjBW0uhYd52").collection("story").
+                                                          //           doc("vHe7VbbqzMWHc6eErcgw").update({
+                                                          //             'like.$cuu_id' : false
+                                                          //           });
+                                                          //       });
+                                                          //     }
+                                                          //   },
+                                                          //   icon: jj ? Icon(Icons.favorite , color: Colors.red,) : Icon(Icons.favorite_border , color: Colors.red,)
+
+                                                          // ),
+                                                          SizedBox(
+                                                            width: size.width / 25,
+                                                          ),
+                                                          InkWell(
+                                                              onTap: () {
+                                                                Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: post_show[index]["post_id"])));
+                                                              },
+                                                              child: Image.asset(
+                                                                "asset/comment.png",
+                                                                scale: 23,
+                                                              )),
+                                                          Expanded(
+                                                            child: Container(),
+                                                          ),
+                                                          Icon(Icons.bookmark)
+                                                          // LikeButton(
+                                                          //   size: 30,
+                                                          //   //likeCount: 100,
+                                                          //   //countPostion: CountPostion.bottom,
+                                                          //   bubblesColor: BubblesColor(dotPrimaryColor: Colors.blue, dotSecondaryColor: Colors.red),
+                                                          //   circleColor: CircleColor(start: Colors.black, end: Colors.white),
+                                                          //   likeBuilder: (isLiked) {
+                                                          //     // if (jj == false) {
+                                                          //     //   return Icon(
+                                                          //     //     Icons.bookmark,
+                                                          //     //     color: Colors.grey,
+                                                          //     //     size: 30,
+                                                          //     //   );
+                                                          //     // } else {
+                                                          //     //   return Icon(
+                                                          //     //     Icons.bookmark,
+                                                          //     //     color: Colors.blue,
+                                                          //     //     size: 30,
+                                                          //     //   );
+                                                          //     // }
+                                                          //   },
+                                                          //   // onTap: (kkr) async {
+                                                          //   //   if (jj == false) {
+                                                          //   //     print("isliked!!");
+                                                          //   //     jj = true;
+                                                          //   //     return !kkr;
+                                                          //   //   } else {
+                                                          //   //     jj = false;
+                                                          //   //     print("isnotliked!!");
+                                                          //   //     return !kkr;
+                                                          //   //   }
+                                                          //   // },
+                                                          // )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // tot_like == 0
+                                                    //     ? Container()
+                                                    //     : Container(
+                                                    //         padding: EdgeInsets.only(right: 10, left: 10),
+                                                    //         width: size.width,
+                                                    //         color: Color.fromARGB(255, 109, 137, 250),
+                                                    //         child: tot_like == 1
+                                                    //             ? Text(
+                                                    //                 "Liked are 1 others",
+                                                    //                 overflow: TextOverflow.ellipsis,
+                                                    //               )
+                                                    //             : Text(
+                                                    //                 "Total Likes are  $tot_like and  others",
+                                                    //                 overflow: TextOverflow.ellipsis,
+                                                    //               ),
+                                                    //       ),
+                                                    Container(
+                                                      padding: EdgeInsets.all(10),
+                                                      width: size.width,
+                                                      child: Text(
+                                                        snapshot.data!["description"],
+                                                        style: TextStyle(fontSize: 18, fontFamily: "SansFont"),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding: EdgeInsets.only(top: 10, right: 20, left: 20, bottom: 10),
+                                                      width: size.width,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: kl[index]["post_id"])));
+                                                        },
+                                                        child: Row(
+                                                          children: [
+                                                            CircleAvatar(
+                                                              radius: 15,
+                                                              backgroundImage: NetworkImage(image),
+                                                            ),
+                                                            Padding(padding: EdgeInsets.only(right: 10)),
+                                                            Text("Add a comments...")
                                                           ],
                                                         ),
                                                       ),
-                                                      Expanded(child: Container()),
-                                                      Text("$diff_time")
-                                                    ],
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onDoubleTap: () {
-                                                    if (jj == false) {
-                                                      setState(() {
-                                                        tot_like += 1;
-                                                        jj = true;
-                                                        _firestore.collection("post").doc(post_show[index]["uid"]).collection("story").doc(post_show[index]["post_id"]).update({'like.$cuu_id': true});
-                                                      });
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    width: size.width,
-                                                    height: size.height / 2.2,
-                                                    child: CachedNetworkImage(
-                                                      fit: BoxFit.cover,
-                                                      imageUrl: snapshot.data!["post"],
-                                                      placeholder: (context, url) => Center(child: Lottie.asset("asset/image_loading.json", width: size.width / 7, height: size.height)),
-                                                      errorWidget: (context, url, error) => Icon(Icons.error),
                                                     ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.only(right: 10, left: 10, top: 5, bottom: 5),
-                                                  child: Row(
-                                                    children: [
-                                                      LikeButton(
-                                                        likeCount: tot_like,
-                                                        countBuilder: (likeCount, isLiked, text) {},
-                                                        likeBuilder: (isLiked) {
-                                                          if (jj == false) {
-                                                            return Icon(
-                                                              Icons.favorite,
-                                                              color: Colors.grey,
-                                                              size: 30,
-                                                            );
-                                                          } else {
-                                                            return Icon(
-                                                              Icons.favorite,
-                                                              color: Color.fromARGB(255, 198, 18, 1),
-                                                              size: 30,
-                                                            );
-                                                          }
-                                                        },
-                                                        onTap: (kkr) async {
-                                                          if (jj == false) {
-                                                            setState(() {
-                                                              tot_like += 1;
-                                                              jj = true;
-
-                                                              _firestore.collection("post").doc(post_show[index]["uid"]).collection("story").doc(post_show[index]["post_id"]).update({'like.$cuu_id': true});
-                                                            });
-
-                                                            return !kkr;
-                                                          } else {
-                                                            print("isnotliked!!");
-                                                            setState(() {
-                                                              tot_like -= 1;
-                                                              jj = false;
-                                                              _firestore.collection("post").doc(post_show[index]["uid"]).collection("story").doc(post_show[index]["post_id"]).update({'like.$cuu_id': false});
-                                                            });
-                                                            return !kkr;
-                                                          }
-                                                        },
-                                                      ),
-
-                                                      // IconButton(
-                                                      //   onPressed: () async{
-                                                      //     if(jj == false){
-                                                      //       setState(() {
-                                                      //         jj = true;
-                                                      //         _firestore.collection("post").doc("6aBmHJnwWXhT3AQl9fjBW0uhYd52").collection("story").
-                                                      //           doc("vHe7VbbqzMWHc6eErcgw").update({
-                                                      //             'like.$cuu_id' : true
-                                                      //           });
-                                                      //       });
-                                                      //     }else{
-                                                      //       setState(() {
-                                                      //         jj = false;
-                                                      //         _firestore.collection("post").doc("6aBmHJnwWXhT3AQl9fjBW0uhYd52").collection("story").
-                                                      //           doc("vHe7VbbqzMWHc6eErcgw").update({
-                                                      //             'like.$cuu_id' : false
-                                                      //           });
-                                                      //       });
-                                                      //     }
-                                                      //   },
-                                                      //   icon: jj ? Icon(Icons.favorite , color: Colors.red,) : Icon(Icons.favorite_border , color: Colors.red,)
-
-                                                      // ),
-                                                      SizedBox(
-                                                        width: size.width / 25,
-                                                      ),
-                                                      InkWell(
-                                                          onTap: () {
-                                                            Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: post_show[index]["post_id"])));
-                                                          },
-                                                          child: Image.asset(
-                                                            "asset/comment.png",
-                                                            scale: 23,
-                                                          )),
-                                                      Expanded(
-                                                        child: Container(),
-                                                      ),
-                                                      Icon(Icons.bookmark)
-                                                      // LikeButton(
-                                                      //   size: 30,
-                                                      //   //likeCount: 100,
-                                                      //   //countPostion: CountPostion.bottom,
-                                                      //   bubblesColor: BubblesColor(dotPrimaryColor: Colors.blue, dotSecondaryColor: Colors.red),
-                                                      //   circleColor: CircleColor(start: Colors.black, end: Colors.white),
-                                                      //   likeBuilder: (isLiked) {
-                                                      //     // if (jj == false) {
-                                                      //     //   return Icon(
-                                                      //     //     Icons.bookmark,
-                                                      //     //     color: Colors.grey,
-                                                      //     //     size: 30,
-                                                      //     //   );
-                                                      //     // } else {
-                                                      //     //   return Icon(
-                                                      //     //     Icons.bookmark,
-                                                      //     //     color: Colors.blue,
-                                                      //     //     size: 30,
-                                                      //     //   );
-                                                      //     // }
-                                                      //   },
-                                                      //   // onTap: (kkr) async {
-                                                      //   //   if (jj == false) {
-                                                      //   //     print("isliked!!");
-                                                      //   //     jj = true;
-                                                      //   //     return !kkr;
-                                                      //   //   } else {
-                                                      //   //     jj = false;
-                                                      //   //     print("isnotliked!!");
-                                                      //   //     return !kkr;
-                                                      //   //   }
-                                                      //   // },
-                                                      // )
-                                                    ],
-                                                  ),
-                                                ),
-                                                // tot_like == 0
-                                                //     ? Container()
-                                                //     : Container(
-                                                //         padding: EdgeInsets.only(right: 10, left: 10),
-                                                //         width: size.width,
-                                                //         color: Color.fromARGB(255, 109, 137, 250),
-                                                //         child: tot_like == 1
-                                                //             ? Text(
-                                                //                 "Liked are 1 others",
-                                                //                 overflow: TextOverflow.ellipsis,
-                                                //               )
-                                                //             : Text(
-                                                //                 "Total Likes are  $tot_like and  others",
-                                                //                 overflow: TextOverflow.ellipsis,
-                                                //               ),
-                                                //       ),
-                                                Container(
-                                                  padding: EdgeInsets.all(10),
-                                                  width: size.width,
-                                                  child: Text(
-                                                    snapshot.data!["description"],
-                                                    style: TextStyle(fontSize: 18, fontFamily: "SansFont"),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.only(top: 10, right: 20, left: 20, bottom: 10),
-                                                  width: size.width,
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: post_show[index]["post_id"])));
-                                                    },
-                                                    child: Row(
-                                                      children: [
-                                                        CircleAvatar(
-                                                          radius: 15,
-                                                          backgroundImage: NetworkImage(image),
-                                                        ),
-                                                        Padding(padding: EdgeInsets.only(right: 10)),
-                                                        Text("Add a comments...")
-                                                      ],
+                                                    Divider(
+                                                      height: 5,
                                                     ),
-                                                  ),
+                                                    Padding(padding: EdgeInsets.all(5))
+                                                  ],
                                                 ),
-                                                Divider(
-                                                  height: 5,
-                                                ),
-                                                Padding(padding: EdgeInsets.all(5))
-                                              ],
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return Container();
-                                    }
-                                  },
-                                );
-                              } else {
-                                return Container();
-                              }
-                            },
-                          );
-                        },
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      },
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
                       ),
-                    ))
+                    ),
+            ))
+
             // Expanded(
             //     child: SingleChildScrollView(
             //   child: Column(
