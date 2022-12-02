@@ -26,31 +26,7 @@ class post_home extends StatefulWidget {
 class _post_homeState extends State<post_home> with SingleTickerProviderStateMixin {
   var _firestore = FirebaseFirestore.instance;
   var _auth = FirebaseAuth.instance;
-  var image = "https://images.unsplash.com/photo-1669172459261-d52881af17ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=500&q=60";
   String cuu_id = FirebaseAuth.instance.currentUser!.uid;
-  bool isLiked = false;
-  int likecon = 10;
-  bool kk = false;
-  bool is_like = false;
-  bool falco = true;
-  int dal = 0;
-  Map<String, dynamic>? like;
-  void getlike() async {
-    _firestore.collection("post").doc("6aBmHJnwWXhT3AQl9fjBW0uhYd52").collection("story").doc("vHe7VbbqzMWHc6eErcgw").get().then((value) {
-      like = value["like"];
-      like!.forEach((key, value) {
-        if (value == true) {
-          dal += 1;
-        }
-      });
-      print("tot like is : $dal");
-
-      final totlike = like?.keys.map((e) => like?[e] == true).toList();
-      //
-      falco = like![_auth.currentUser!.uid] == null ? false : true;
-      // print("falco is : $falco");
-    });
-  }
 
   bool isload = false;
   List post_show = [];
@@ -128,12 +104,29 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
         });
   }
 
+  bool imgLoad = false;
+  String? image;
+  void image_get_user() async {
+    setState(() {
+      imgLoad = true;
+    });
+    await _firestore.collection("users").doc(_auth.currentUser!.uid).get().then((value) {
+      setState(() {});
+      image = value["image"];
+    });
+    setState(() {
+      imgLoad = false;
+    });
+  }
+
   late AnimationController cont;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     //get_post();
+    image_get_user();
     show_data();
     sc = ScrollController();
     sc.addListener(() {
@@ -412,7 +405,10 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           IconButton(
                                                               onPressed: () async {
                                                                 try {
-                                                                  var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"], destination: AndroidDestinationType.custom(directory: 'FriDayChat'));
+                                                                  var imageId = await ImageDownloader.downloadImage(
+                                                                    snapshot.data!["post"],
+                                                                    //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
+                                                                  );
                                                                   if (imageId == null) {
                                                                     return;
                                                                   }
@@ -498,7 +494,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           children: [
                                                             CircleAvatar(
                                                               radius: 15,
-                                                              backgroundImage: NetworkImage(image),
+                                                              backgroundImage: imgLoad ? null : NetworkImage(image!),
                                                             ),
                                                             Padding(padding: EdgeInsets.only(right: 10)),
                                                             Text("Add a comments...")

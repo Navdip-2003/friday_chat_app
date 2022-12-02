@@ -22,18 +22,18 @@ class _comment_postState extends State<comment_post> {
   ScrollController sc = new ScrollController();
   bool isload = false;
   String? image;
-  image_get_user() async {
+  bool imgLoad = false;
+  void image_get_user() async {
     setState(() {
-      isload = true;
+      imgLoad = true;
     });
     await _firestore.collection("users").doc(_auth.currentUser!.uid).get().then((value) {
       setState(() {});
       image = value["image"];
     });
     setState(() {
-      isload = false;
+      imgLoad = false;
     });
-    return image!;
   }
 
   String post_id;
@@ -230,12 +230,16 @@ class _comment_postState extends State<comment_post> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                            flex: 1,
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.cyanAccent,
-                            ),
-                          ),
+                              flex: 1,
+                              child: imgLoad
+                                  ? CircleAvatar(
+                                      radius: 20,
+                                      backgroundColor: Colors.white12,
+                                    )
+                                  : CircleAvatar(
+                                      radius: 20,
+                                      backgroundImage: NetworkImage(image!),
+                                    )),
                           Padding(padding: EdgeInsets.all(10)),
                           Flexible(
                               flex: 2,
