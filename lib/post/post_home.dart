@@ -52,7 +52,10 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   DocumentSnapshot? last_re;
   List kl = [];
   void show_data() async {
-    isloading = true;
+    setState(() {
+       isloading = true;
+    });
+   
     await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(3).get().then((value) {
       if (value.docChanges.isNotEmpty) {
         kl = value.docs;
@@ -164,7 +167,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              height: size.height / 30,
+              height: size.height / 25,
             ),
             Container(
               width: size.width,
@@ -201,6 +204,8 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                         });
                       },
                       child: Container(
+                       
+                        color: Colors.red,
                         width: size.width,
                         child: ListView.builder(
                           controller: sc,
