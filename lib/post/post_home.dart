@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:friday_chat_app/open_image.dart';
 import 'package:friday_chat_app/post/add_post.dart';
 import 'package:friday_chat_app/post/comment_post.dart';
 import 'package:like_button/like_button.dart';
@@ -12,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lottie/lottie.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
+import 'package:image_downloader/image_downloader.dart';
 
 class post_home extends StatefulWidget {
   const post_home({super.key});
@@ -75,7 +78,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   void show_data() async {
     isloading = true;
     await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(3).get().then((value) {
-      if (kl.isNotEmpty) {
+      if (value.docChanges.isNotEmpty) {
         kl = value.docs;
         last_re = value.docs[value.docs.length - 1];
       }
@@ -308,6 +311,15 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           });
                                                         }
                                                       },
+                                                      onTap: () {
+                                                        var url = snapshot.data!["post"];
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (context) => open_image(
+                                                                      url: url,
+                                                                    )));
+                                                      },
                                                       child: Container(
                                                         width: size.width,
                                                         height: size.height / 2.2,
@@ -391,12 +403,26 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           ),
                                                           InkWell(
                                                               onTap: () {
-                                                                Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: post_show[index]["post_id"])));
+                                                                Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: kl[index]["post_id"])));
                                                               },
                                                               child: Image.asset(
                                                                 "asset/comment.png",
                                                                 scale: 23,
                                                               )),
+                                                          IconButton(
+                                                              onPressed: () async {
+                                                                try {
+                                                                  var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"], destination: AndroidDestinationType.custom(directory: 'FriDayChat'));
+                                                                  if (imageId == null) {
+                                                                    return;
+                                                                  }
+                                                                  var path = await ImageDownloader.findPath(imageId);
+                                                                  print(path);
+                                                                } on PlatformException catch (error) {
+                                                                  print(error);
+                                                                }
+                                                              },
+                                                              icon: Icon(Icons.download)),
                                                           Expanded(
                                                             child: Container(),
                                                           ),
@@ -506,8 +532,11 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                         ),
                       ),
                     ),
-            ))
-
+            )),
+            if (get_pr)
+              Container(
+                child: CircularProgressIndicator(),
+              )
             // Expanded(
             //     child: SingleChildScrollView(
             //   child: Column(
