@@ -411,7 +411,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                               onPressed: () async {
                                                                 try {
                                                                   var imageId = await ImageDownloader.downloadImage(
-                                                                    snapshot.data!["post"],
+                                                                    snapshot.data!["post"]
                                                                     //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
                                                                   );
                                                                   if (imageId == null) {
@@ -423,7 +423,26 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                                   print(error);
                                                                 }
                                                               },
-                                                              icon: Icon(Icons.download)),
+                                                              icon: Icon(Icons.download)
+                                                            ),
+                                                            LikeButton(
+                                                              size: 30,
+                                                              //likeCount: 100,
+                                                              //countPostion: CountPostion.bottom,
+                                                              bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
+                                                              circleColor: CircleColor(start: Colors.black, end: Colors.white),
+                                                              likeBuilder: (isLiked) {
+                                                               return Icon(
+                                                                    Icons.download,
+                                                                    color: Color.fromARGB(255, 2, 97, 249),
+                                                                    size: 30,
+                                                                  );
+                                                              },
+                                                              onTap: (isliked) async {
+                                                                return !isliked;
+                                                                
+                                                              },
+                                                            ),
                                                           Expanded(
                                                             child: Container(),
                                                           ),
@@ -522,12 +541,12 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                       },
                                     );
                                   } else {
-                                    return Container();
+                                    return Container(child: Center(child: CircularProgressIndicator(),),);
                                   }
                                 },
                               );
                             } else {
-                              return Container();
+                              return Container(child: Center(child: CircularProgressIndicator()),);
                             }
                           },
                         ),

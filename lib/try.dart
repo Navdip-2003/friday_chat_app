@@ -1,12 +1,13 @@
 import 'dart:developer';
-import 'dart:math';
-
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class tty extends StatefulWidget {
   const tty({super.key});
@@ -217,6 +218,77 @@ class _demotyState extends State<demoty> {
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+
+class file_piker extends StatefulWidget {
+  const file_piker({super.key});
+
+  @override
+  State<file_piker> createState() => _file_pikerState();
+}
+
+class _file_pikerState extends State<file_piker> {
+  File? image;
+  Future file_pick() async{
+     final result = await FilePicker.platform.pickFiles(allowMultiple: false);  
+      if (result != null) {
+       final path = result.files.single.path;
+       setState(() {
+         image = File(path!);
+         var ll = image!.path.split("/").last;
+         log("image : $ll");
+         file_upload();
+       });
+      } 
+  }
+  Future file_upload() async{
+    if(image == null) return;
+
+    final filename = image!.path.split("/").last;
+    final destination = 'files_upload/$filename';
+    final ref = await FirebaseStorage.instance.ref(destination);
+    final url = await ref.putFile(image!);
+  
+
+
+  }
+  @override
+  Widget build(BuildContext context) {
+    final text = image == null ? Text("Pick file!!") : Text(image!.path.split("/").last);
+    return Scaffold(
+      
+      appBar: AppBar(
+        title: Text("File Picker😁 "),
+      ),
+      body: Container(
+        child: Container(
+         
+          child: Center(
+            child: Column(
+              children: [
+                text,
+                ElevatedButton(
+                  onPressed: (){
+                    file_pick();
+                  },
+                  child: Text("File Picker"),
+                ),
+                 ElevatedButton(
+                  onPressed: (){
+                    file_upload();
+                  },
+                  child: Text("File Upload"),
+                ),
+              ],
+            ),
+          ),
+        ),
+
       ),
     );
   }

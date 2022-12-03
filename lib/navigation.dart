@@ -31,10 +31,10 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
   int currentindex = 0;
   List pages = [
     contact(),
-    //  homepage(),
-    //demoty(),
-    comment_pagination(),
-    // pagination2(),
+   
+    //comment_pagination(),
+    file_piker(),
+
     post_home(),
     profile()
   ];
