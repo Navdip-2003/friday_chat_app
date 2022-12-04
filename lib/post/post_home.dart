@@ -189,8 +189,8 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
               ),
             ),
             Expanded(
-                child: Container(
-              child: isload
+              child: Container(
+                child: isload
                   ? Center(
                       child: Lottie.asset("asset/loading.json", width: size.width / 7, height: size.height),
                     )
@@ -205,7 +205,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                       },
                       child: Container(
                        
-                        color: Colors.red,
+                       // color: Colors.red,
                         width: size.width,
                         child: ListView.builder(
                           controller: sc,
@@ -541,7 +541,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                       },
                                     );
                                   } else {
-                                    return Container(child: Center(child: CircularProgressIndicator(),),);
+                                    return Container();
                                   }
                                 },
                               );
@@ -552,7 +552,8 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                         ),
                       ),
                     ),
-            )),
+              )
+            ),
             if (get_pr)
               Container(
                 child: CircularProgressIndicator(),

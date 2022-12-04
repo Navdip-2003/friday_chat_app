@@ -239,7 +239,9 @@ class _file_pikerState extends State<file_piker> {
       allowMultiple: false ,
       type: FileType.image ,
       
-    );  
+    );    
+
+      
 
       if (result != null) {
        final path = result.files.single.path;
