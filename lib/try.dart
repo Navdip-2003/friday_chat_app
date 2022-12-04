@@ -235,14 +235,19 @@ class file_piker extends StatefulWidget {
 class _file_pikerState extends State<file_piker> {
   File? image;
   Future file_pick() async{
-     final result = await FilePicker.platform.pickFiles(allowMultiple: false);  
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false ,
+      type: FileType.image ,
+      allowedExtensions: ['jpg', 'jpeg', 'png']
+    );  
+
       if (result != null) {
        final path = result.files.single.path;
        setState(() {
          image = File(path!);
          var ll = image!.path.split("/").last;
          log("image : $ll");
-         file_upload();
+         
        });
       } 
   }
@@ -253,6 +258,9 @@ class _file_pikerState extends State<file_piker> {
     final destination = 'files_upload/$filename';
     final ref = await FirebaseStorage.instance.ref(destination);
     final url = await ref.putFile(image!);
+    String ll =await url.ref.getDownloadURL();
+    print(ll);
+   
   
 
 
