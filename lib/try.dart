@@ -238,7 +238,7 @@ class _file_pikerState extends State<file_piker> {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: false ,
       type: FileType.image ,
-      allowedExtensions: ['jpg', 'jpeg', 'png']
+      allowedExtensions: ['jpg', 'jpeg', ]
     );  
 
       if (result != null) {
