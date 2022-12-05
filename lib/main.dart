@@ -25,6 +25,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friday_chat_app/log/register.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:friday_chat_app/video.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,9 +57,10 @@ Future main() async {
   runApp(MaterialApp(
       title: "FriDay_Chat",
       home:
-          //demoty()
-          //demo2()
-          splash()
+         
+    VideoWidget
+    ()
+ //splash()
       // use == null ? login() : navigation()
 
       ));

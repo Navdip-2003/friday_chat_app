@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:video_player/video_player.dart';
 
 class tty extends StatefulWidget {
   const tty({super.key});
@@ -237,12 +238,9 @@ class _file_pikerState extends State<file_piker> {
   Future file_pick() async{
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: false ,
-      type: FileType.image ,
-      
-    );    
-
-      
-
+      type: FileType.custom ,
+      allowedExtensions: ["jpg" , "mp4"]
+    );  
       if (result != null) {
        final path = result.files.single.path;
        setState(() {
@@ -267,6 +265,25 @@ class _file_pikerState extends State<file_piker> {
 
 
   }
+  late VideoPlayerController _controller;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = VideoPlayerController.network(
+        "https://firebasestorage.googleapis.com/v0/b/chat-data-f147e.appspot.com/o/files_upload%2FTrue_Line_Status_%F0%9F%92%94_%7C%7C_Shri_Krishna_Status_%F0%9F%99%8F_%7C%7C_Mahabharat_WhatsApp_Status_%F0%9F%98%94_%7C%7C_Sad_Status_%F0%9F%98%AD(720p).mp4?alt=media&token=3c625ef0-1a13-47dc-82a2-44a54a67e610")
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     final text = image == null ? Text("Pick file!!") : Text(image!.path.split("/").last);
@@ -294,6 +311,29 @@ class _file_pikerState extends State<file_piker> {
                   },
                   child: Text("File Upload"),
                 ),
+               Container(
+                height: 300,
+                 child: Center(
+                    child: _controller.value.isInitialized
+                        ? AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: VideoPlayer(_controller),
+                          )
+                        : Container(),
+                  ),
+               ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _controller.value.isPlaying
+                          ? _controller.pause()
+                          : _controller.play();
+                    });
+                  },
+                  child: Icon(
+                    _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                  ),
+                )
               ],
             ),
           ),
