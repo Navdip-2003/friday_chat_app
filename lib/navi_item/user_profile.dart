@@ -8,6 +8,7 @@ import 'package:friday_chat_app/methods.dart';
 import 'package:friday_chat_app/navi_item/edit_profile.dart';
 import 'package:friday_chat_app/navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:friday_chat_app/post/settingInAppPost/manage_post.dart';
 import 'package:friday_chat_app/variables.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -163,10 +164,15 @@ class _profileState extends State<profile> {
                           SizedBox(
                             height: size.height / 20,
                           ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => manage_post()));
+                              },
+                              child: Text("Manage Post")),
                           //friend listview
 
                           StreamBuilder(
-                            stream: _store.collection("contacts").doc(_auth.currentUser!.email).collection("lastonline").orderBy("email", descending: true).snapshots(),
+                            stream: _store.collection("contacts").doc(_auth.currentUser!.email).collection("lastonline").snapshots(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return Column(
