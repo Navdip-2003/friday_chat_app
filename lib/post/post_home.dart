@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,7 @@ import 'package:lottie/lottie.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class post_home extends StatefulWidget {
   const post_home({super.key});
@@ -53,9 +55,9 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   List kl = [];
   void show_data() async {
     setState(() {
-       isloading = true;
+      isloading = true;
     });
-   
+
     await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(3).get().then((value) {
       if (value.docChanges.isNotEmpty) {
         kl = value.docs;
@@ -122,12 +124,21 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
     });
   }
 
+  void permission() async {
+    var status = await Permission.storage.status;
+    if (status.isDenied) {
+      await Permission.storage.request();
+    }
+    log("log : $status");
+  }
+
   late AnimationController cont;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    permission();
     //get_post();
     image_get_user();
     show_data();
@@ -189,8 +200,8 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
               ),
             ),
             Expanded(
-              child: Container(
-                child: isload
+                child: Container(
+              child: isload
                   ? Center(
                       child: Lottie.asset("asset/loading.json", width: size.width / 7, height: size.height),
                     )
@@ -204,8 +215,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                         });
                       },
                       child: Container(
-                       
-                       // color: Colors.red,
+                        // color: Colors.red,
                         width: size.width,
                         child: ListView.builder(
                           controller: sc,
@@ -407,42 +417,58 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                                 "asset/comment.png",
                                                                 scale: 23,
                                                               )),
-                                                          IconButton(
-                                                              onPressed: () async {
-                                                                try {
-                                                                  var imageId = await ImageDownloader.downloadImage(
-                                                                    snapshot.data!["post"]
-                                                                    //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
-                                                                  );
-                                                                  if (imageId == null) {
-                                                                    return;
-                                                                  }
-                                                                  var path = await ImageDownloader.findPath(imageId);
-                                                                  print(path);
-                                                                } on PlatformException catch (error) {
-                                                                  print(error);
-                                                                }
-                                                              },
-                                                              icon: Icon(Icons.download)
-                                                            ),
-                                                            LikeButton(
-                                                              size: 30,
-                                                              //likeCount: 100,
-                                                              //countPostion: CountPostion.bottom,
-                                                              bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
-                                                              circleColor: CircleColor(start: Colors.black, end: Colors.white),
-                                                              likeBuilder: (isLiked) {
-                                                               return Icon(
-                                                                    Icons.download,
-                                                                    color: Color.fromARGB(255, 2, 97, 249),
-                                                                    size: 30,
-                                                                  );
-                                                              },
-                                                              onTap: (isliked) async {
+                                                          // IconButton(
+                                                          //     onPressed: () async {
+                                                          //       try {
+                                                          //         var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"]
+                                                          //             //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
+                                                          //             );
+                                                          //         if (imageId == null) {
+                                                          //           return;
+                                                          //         }
+                                                          //         var path = await ImageDownloader.findPath(imageId);
+                                                          //         print(path);
+                                                          //       } on PlatformException catch (error) {
+                                                          //         print(error);
+                                                          //       }
+                                                          //     },
+                                                          //     icon: Icon(Icons.download)),
+                                                          Padding(padding: EdgeInsets.all(8)),
+                                                          LikeButton(
+                                                            size: 30,
+                                                            //likeCount: 100,
+                                                            //countPostion: CountPostion.bottom,
+                                                            bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
+                                                            circleColor: CircleColor(start: Colors.black, end: Colors.white),
+                                                            likeBuilder: (isLiked) {
+                                                              return Icon(
+                                                                Icons.download,
+                                                                color: Color.fromARGB(255, 2, 97, 249),
+                                                                size: 25,
+                                                              );
+                                                            },
+                                                            onTap: (isliked) async {
+                                                              if (await Directory("FriDayChat").exists()) {
+                                                                print("exist!!");
+                                                                // try {
+                                                                //   var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"], destination: AndroidDestinationType.custom(directory: '/FriDayChat/'));
+                                                                //   if (imageId == null) {
+                                                                //     return !isliked;
+                                                                //   }
+                                                                //   var path = await ImageDownloader.findPath(imageId);
+                                                                //   return !isliked;
+                                                                // } on PlatformException catch (error) {
+                                                                //   print(error);
+                                                                // }
                                                                 return !isliked;
-                                                                
-                                                              },
-                                                            ),
+                                                              } else {
+                                                                await Directory("/FriDayChat").create();
+                                                                print("not exist");
+                                                                return !isliked;
+                                                              }
+                                                            },
+                                                          ),
+
                                                           Expanded(
                                                             child: Container(),
                                                           ),
@@ -546,14 +572,15 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                 },
                               );
                             } else {
-                              return Container(child: Center(child: CircularProgressIndicator()),);
+                              return Container(
+                                child: Center(child: CircularProgressIndicator()),
+                              );
                             }
                           },
                         ),
                       ),
                     ),
-              )
-            ),
+            )),
             if (get_pr)
               Container(
                 child: CircularProgressIndicator(),

@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friday_chat_app/try.dart';
 import 'package:friday_chat_app/variables.dart';
+import 'package:friday_chat_app/vedio_play.dart';
 
 class navigation extends StatefulWidget {
   int? i;
@@ -31,9 +32,12 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
   int currentindex = 0;
   List pages = [
     contact(),
-   
+
     //comment_pagination(),
-    file_piker(),
+    //file_piker(),
+
+    //comment_pagination(),
+    permission_handle(),
 
     post_home(),
     profile()
