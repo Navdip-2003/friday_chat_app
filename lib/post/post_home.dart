@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +15,6 @@ import 'package:lottie/lottie.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:image_downloader/image_downloader.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class post_home extends StatefulWidget {
   const post_home({super.key});
@@ -55,9 +53,9 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   List kl = [];
   void show_data() async {
     setState(() {
-      isloading = true;
+       isloading = true;
     });
-
+   
     await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(3).get().then((value) {
       if (value.docChanges.isNotEmpty) {
         kl = value.docs;
@@ -130,6 +128,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
   void initState() {
     // TODO: implement initState
     super.initState();
+    //get_post();
     image_get_user();
     show_data();
     sc = ScrollController();
@@ -190,8 +189,8 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
               ),
             ),
             Expanded(
-                child: Container(
-              child: isload
+              child: Container(
+                child: isload
                   ? Center(
                       child: Lottie.asset("asset/loading.json", width: size.width / 7, height: size.height),
                     )
@@ -205,7 +204,8 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                         });
                       },
                       child: Container(
-                        // color: Colors.red,
+                       
+                       // color: Colors.red,
                         width: size.width,
                         child: ListView.builder(
                           controller: sc,
@@ -407,59 +407,46 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                                 "asset/comment.png",
                                                                 scale: 23,
                                                               )),
-                                                          // IconButton(
-                                                          //     onPressed: () async {
-                                                          //       try {
-                                                          //         var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"]
-                                                          //             //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
-                                                          //             );
-                                                          //         if (imageId == null) {
-                                                          //           return;
-                                                          //         }
-                                                          //         var path = await ImageDownloader.findPath(imageId);
-                                                          //         print(path);
-                                                          //       } on PlatformException catch (error) {
-                                                          //         print(error);
-                                                          //       }
-                                                          //     },
-                                                          //     icon: Icon(Icons.download)),
-                                                          Padding(padding: EdgeInsets.all(10)),
-                                                          LikeButton(
-                                                            size: 30,
-                                                            //likeCount: 100,
-                                                            //countPostion: CountPostion.bottom,
-                                                            bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
-                                                            circleColor: CircleColor(start: Colors.black, end: Colors.white),
-                                                            likeBuilder: (isLiked) {
-                                                              return Icon(
-                                                                Icons.download,
-                                                                color: Color.fromARGB(255, 2, 97, 249),
-                                                                size: 25,
-                                                              );
-                                                            },
-                                                            onTap: (isliked) async {
-                                                              // await Directory('dir/subdir').create(recursive: true);
-                                                              try {
-                                                                var imageId = await ImageDownloader.downloadImage(
-                                                                  snapshot.data!["post"],
-                                                                  //destination: AndroidDestinationType.custom(directory: 'data')
-                                                                  //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
-                                                                );
-                                                                if (imageId == null) {
-                                                                  return !isliked;
+                                                          IconButton(
+                                                              onPressed: () async {
+                                                                try {
+                                                                  var imageId = await ImageDownloader.downloadImage(
+                                                                    snapshot.data!["post"]
+                                                                    //destination: AndroidDestinationType.custom(directory: 'FriDayChat')
+                                                                  );
+                                                                  if (imageId == null) {
+                                                                    return;
+                                                                  }
+                                                                  var path = await ImageDownloader.findPath(imageId);
+                                                                  print(path);
+                                                                } on PlatformException catch (error) {
+                                                                  print(error);
                                                                 }
-                                                                var path = await ImageDownloader.findPath(imageId);
-                                                                //print(path);
+                                                              },
+                                                              icon: Icon(Icons.download)
+                                                            ),
+                                                            LikeButton(
+                                                              size: 30,
+                                                              //likeCount: 100,
+                                                              //countPostion: CountPostion.bottom,
+                                                              bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
+                                                              circleColor: CircleColor(start: Colors.black, end: Colors.white),
+                                                              likeBuilder: (isLiked) {
+                                                               return Icon(
+                                                                    Icons.download,
+                                                                    color: Color.fromARGB(255, 2, 97, 249),
+                                                                    size: 30,
+                                                                  );
+                                                              },
+                                                              onTap: (isliked) async {
                                                                 return !isliked;
-                                                              } on PlatformException catch (error) {
-                                                                print(error);
-                                                              }
-                                                            },
-                                                          ),
+                                                                
+                                                              },
+                                                            ),
                                                           Expanded(
                                                             child: Container(),
                                                           ),
-
+                                                          Icon(Icons.bookmark)
                                                           // LikeButton(
                                                           //   size: 30,
                                                           //   //likeCount: 100,
@@ -559,15 +546,14 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                 },
                               );
                             } else {
-                              return Container(
-                                child: Center(child: CircularProgressIndicator()),
-                              );
+                              return Container(child: Center(child: CircularProgressIndicator()),);
                             }
                           },
                         ),
                       ),
                     ),
-            )),
+              )
+            ),
             if (get_pr)
               Container(
                 child: CircularProgressIndicator(),
