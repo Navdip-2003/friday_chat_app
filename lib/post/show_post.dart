@@ -57,9 +57,11 @@ class _show_postState extends State<show_post> {
     });
     for (var i = 0; i < postdata.length; i++) {
       await _firestore.collection("post").doc(postdata[i]["uid"]).collection("story").get().then((value) {
+        print("**********************************");
         ppdata.addAll(value.docs);
-      }).then((value) {
-        print(ppdata.length);
+        value.docs.forEach((element) {
+          print(element.data());
+        });
       });
     }
   }
