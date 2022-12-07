@@ -104,23 +104,10 @@ class _chatroomState extends State<chatroom> {
         isloading = false;
       });
     });
-    //await _firestore.collection("contacts").doc(user_email).collection("lastonline").doc(usermap["email"]).delete();
-
-    // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> navigation() ), (route) => false);
-    // setState(() {
-    //       isloading = false;
-    //     });
   }
 
   Future last_save() async {
     var last;
-    // await _firestore.collection("chatroom").doc(chat_id).collection("chat").orderBy("time" , descending: true).get().then((value) {
-    //   last = value.docs[0]["message"];
-    // });
-    // await _firestore.collection("contacts").
-    //     doc(_auth.currentUser!.email).collection("lastonline").doc(usermap["email"]).update({
-    //       "last_message" : last
-    //     });
   }
 
   chat_endtime() async {
@@ -144,8 +131,6 @@ class _chatroomState extends State<chatroom> {
     }
     await _firestore.collection("contacts").doc(_auth.currentUser!.uid).collection("lastonline").doc(usermap["uid"]).update({
       "time": _time,
-      //"last_message" : mess.text,
-      //"image" : usermap["image"]
     });
   }
 
@@ -159,8 +144,6 @@ class _chatroomState extends State<chatroom> {
         pick_image = File(image.path);
         print("image path is : " + pick_image.toString());
         upload_pickimage();
-        // ft_image = image.path.split("/").last;
-        // print(ft_image);
       });
     }
   }
@@ -226,125 +209,6 @@ class _chatroomState extends State<chatroom> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: false,
-
-      // appBar:
-      // AppBar(
-      //   // menu bar
-      //   actions: [
-      //     Hero(
-      //       tag: 'menu',
-      //       child: PopupMenuButton(
-      //        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-
-      //         onSelected: ((value) {
-
-      //           if(value == "profile"){
-      //             Navigator.push(context, MaterialPageRoute(builder: (context)=>chat_profile(usermap : usermap)));
-      //           }else if(value == "clear"){
-      //             delete_message();
-      //            // Navigator.push(context, MaterialPageRoute(builder: (context)=>navigation()));
-
-      //           }else if(value == "Blok"){
-      //             blok_message();
-
-      //           }
-
-      //         }),
-
-      //         itemBuilder: (context){
-      //           return [
-      //           PopupMenuItem(
-      //             value: "profile",
-      //             child: ListTile(
-      //               title: Text("Profile" ,style: TextStyle(color: Colors.black , fontWeight: FontWeight.w500)),
-      //               leading: Icon(Icons.person, size: 30,color: Colors.black54),
-      //             )
-      //           ),
-      //            PopupMenuItem(
-      //             value: "clear",
-      //             child: ListTile(
-      //               title: Text("Clear Chat" , style: TextStyle(color: Colors.black , fontWeight: FontWeight.w500),),
-      //               leading: Icon(Icons.delete_forever_sharp , size: 30,color: Colors.black54,),
-      //             )
-      //           ),
-
-      //            PopupMenuItem(
-      //             value: "Blok",
-      //             child: ListTile(
-      //               title: Text("Block", style: TextStyle(color: Colors.black , fontWeight: FontWeight.w500)),
-      //               leading: Icon(Icons.block_sharp, size: 30,color: Colors.black54),
-      //             )
-      //           ),
-
-      //         ];
-      //         }
-      //       ),
-      //     )
-      //   ],
-      //   leading:
-      //   IconButton(icon: Icon(Icons.arrow_back ,color: Colors.black54,size: 30,), onPressed: () {
-      //     Navigator.pop(context);
-
-      //     },
-      //   ),
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      //   toolbarHeight: rang.size.height / 12,
-      //   brightness: Brightness.dark,
-      //   flexibleSpace: Container(
-      //     decoration: BoxDecoration(
-      //       borderRadius: BorderRadius.only(bottomRight: Radius.circular(20) , bottomLeft: Radius.circular(20)),
-      //       color: Color.fromARGB(255, 231, 231, 230)
-      //     ),
-      //   ),
-
-      //  title:
-      //    StreamBuilder<DocumentSnapshot>(
-      //     stream: _firestore.collection("users").doc(usermap["uid"]).snapshots(),
-      //     builder: (context , snapshot){
-      //       if(snapshot.data != null){
-      //         return Container(
-
-      //         child: Row(
-      //           mainAxisAlignment: MainAxisAlignment.start,
-      //           children: [
-      //             CircleAvatar(
-      //               radius: 30,
-      //               backgroundImage: NetworkImage(usermap["image"] != "" ? usermap["image"] :
-      //                 "https://i.pinimg.com/236x/97/67/b3/9767b3464d63a84d4d1cd01749aa2b03.jpg"),
-      //             ),
-      //             Container(width: rang.size.width /25,),
-      //             Container(
-      //               height: rang.size.height / 13,
-
-      //               child: Stack(
-      //                 children: [
-      //                   Padding(
-      //                     padding: const EdgeInsets.only(bottom: 10),
-      //                     child: Center(child: Text( usermap["name"] != "" ? usermap["name"] : "NO Name"
-      //                     , style: TextStyle(fontFamily: "SansFont" ,
-      //                  fontSize: 20 , color: Colors.black87 , fontWeight: FontWeight.w800)),),
-      //                   ),
-      //                   Positioned(
-      //                      top: rang.size.height / 17,
-      //                     //top: 40,
-
-      //                     child: Text(snapshot.data!["status"] ,style: TextStyle(fontSize: 10 ,color: Color.fromARGB(255, 4, 111, 95))))
-      //                 ],
-      //               ),
-      //             ),
-
-      //           ],
-      //         ),
-      //       );
-
-      //       }else{
-      //         return Container();
-      //       }
-      //     }
-      //   )
-      //    ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: SizedBox.fromSize(
         size: Size.square(40),
@@ -364,68 +228,6 @@ class _chatroomState extends State<chatroom> {
           ),
         ),
       ),
-      //  bottomNavigationBar:
-      //  Padding(
-      //   padding:  EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      //   child: Container(
-      //     height: rang.size.height / 10,
-      //     width: rang.size.width,
-      //     alignment: Alignment.center,
-      //     decoration: BoxDecoration(
-      //       color: Color.fromARGB(134, 215, 214, 214),
-      //       borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))
-      //     ),
-      //     child: Container(
-
-      //       height: rang.size.height / 12,
-      //       width: rang.size.width / 1.1  ,
-      //       child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-
-      //         children: [
-      //           Flexible(
-      //             flex: 7,
-      //             child: Container(
-      //               alignment: Alignment.center,
-
-      //               child: TextField(
-
-      //                 controller: mess,
-      //                 decoration: InputDecoration(
-      //                   suffixIcon: IconButton(icon: Icon( Icons.camera_alt_rounded ,
-      //                     size: rang.size.height / 30 , color: Color.fromARGB(255, 88, 87, 87)),
-      //                   onPressed: () {
-      //                     image_picker();
-
-      //                   },),
-      //                   hintText: "Message",
-
-      //                   border: OutlineInputBorder(
-      //                     borderSide: BorderSide(strokeAlign: StrokeAlign.inside),
-      //                     borderRadius: BorderRadius.circular(20)
-      //                   )
-      //                 ),
-      //               ),
-      //             ),
-      //           ),
-      //           Flexible(
-      //             flex: 1,
-      //             child: Container(
-      //               margin: EdgeInsets.only(left: rang.size.width *0.015),
-      //               child: IconButton(onPressed: () {
-      //                   send_message();
-      //                // scrolltobottom();
-      //               }, icon: Icon(Icons.send , size: 30,)
-      //             ),
-
-      //             ),
-      //           )
-      //         ],
-      //       ),
-      //     )
-      //   ),
-      // ),
-
       bottomNavigationBar: Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: Container(
@@ -809,94 +611,6 @@ class _chatroomState extends State<chatroom> {
                                   }
 
                                   return Container();
-
-                                  // return
-                                  // Slidable(
-                                  //   endActionPane: ActionPane(
-                                  //     extentRatio: 0.25,
-                                  //     motion: BehindMotion(),
-                                  //     children: [
-                                  //       SlidableAction(
-
-                                  //         autoClose: true,
-                                  //         onPressed: (context) async{
-                                  //            var delete_key = snapshot.data!.docs[index].id;
-                                  //            await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(delete_key).delete();
-                                  //          },
-                                  //         icon: Icons.delete,
-                                  //       )
-                                  //     ],
-                                  //   ),
-
-                                  //   child:
-                                  //   me_ty == "text" ?
-                                  //     Container(
-                                  //       width: rang.size.width,
-                                  //       alignment: snapshot.data!.docs[index]['sendy'] ==
-                                  //         _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
-                                  //       child: Container(
-                                  //         padding: EdgeInsets.symmetric(horizontal: 20 , vertical: 8),
-                                  //         margin: EdgeInsets.symmetric(horizontal: 13 , vertical: 8),
-                                  //         decoration:  BoxDecoration(
-                                  //           borderRadius:
-                                  //           BorderRadius.only(
-                                  //             topRight: Radius.circular(15) ,
-                                  //             bottomRight: Radius.circular(0) ,
-                                  //             topLeft: Radius.circular(15),
-                                  //             bottomLeft: Radius.circular(15)
-                                  //           ),
-                                  //           gradient: snapshot.data!.docs[index]['sendy'] ==
-                                  //             _auth.currentUser!.displayName ?
-                                  //             LinearGradient(
-                                  //               colors: [Color.fromARGB(255, 45, 83, 137) ,
-                                  //                       Color.fromARGB(255, 50, 114, 44)]):
-                                  //             LinearGradient(
-                                  //               colors: [ Color.fromARGB(255, 50, 114, 44)  ,
-                                  //                       Color.fromARGB(255, 45, 83, 137) ]),
-                                  //         ),
-                                  //         child: Text(snapshot.data!.docs[index]['message'],style: TextStyle(fontSize: 18 , color: Colors.white),),
-
-                                  //       ),
-                                  //     ):
-                                  //   Container(
-                                  //     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                  //     height: rang.size.height / 4.4,
-                                  //     width: rang.size.width,
-
-                                  //     alignment: snapshot.data!.docs[index]["sendy"] == _auth.currentUser!.displayName ?
-                                  //         Alignment.centerRight : Alignment.centerLeft,
-                                  //     child: InkWell(
-                                  //       onTap: () {
-                                  //         Navigator.push(context,
-                                  //          MaterialPageRoute(builder:
-                                  //          (context)=>open_image(url : snapshot.data!.docs[index]['message'] )));
-                                  //       },
-                                  //       child: Container(
-                                  //         height: rang.size.height / 4.3,
-                                  //         width: rang.size.width / 2.6,
-
-                                  //         alignment: Alignment.center,
-                                  //         decoration: BoxDecoration(
-
-                                  //           //snapshot.data!.docs[index]['message']
-                                  //         ),
-                                  //         child: snapshot.data!.docs[index]['message'] != "" ?
-                                  //             Container(
-                                  //               height: rang.size.height ,
-                                  //               width: rang.size.width,
-                                  //               child: ClipRRect(
-                                  //                 borderRadius: BorderRadius.circular(20),
-                                  //                 child: Image.network(snapshot.data!.docs[index]['message'], fit: BoxFit.cover,
-                                  //                 ),
-                                  //               )
-                                  //             )
-
-                                  //             : Center(child: CircularProgressIndicator(),) ,
-
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // );
                                 });
                           } else {
                             return Center(

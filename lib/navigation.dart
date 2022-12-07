@@ -12,8 +12,10 @@ import 'package:friday_chat_app/single_chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friday_chat_app/try.dart';
+import 'package:friday_chat_app/try1.dart';
 import 'package:friday_chat_app/variables.dart';
 import 'package:friday_chat_app/vedio_play.dart';
+import 'package:friday_chat_app/video.dart';
 
 class navigation extends StatefulWidget {
   int? i;
@@ -35,9 +37,11 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
 
     //comment_pagination(),
     //file_piker(),
-
+    //MyHomePage(),
     //comment_pagination(),
-    permission_handle(),
+    //permission_handle(),
+    //try1(),
+    chat_pagination(),
 
     post_home(),
     profile()
