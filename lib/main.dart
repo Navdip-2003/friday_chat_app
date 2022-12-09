@@ -29,22 +29,22 @@ import 'package:friday_chat_app/video.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  // if(kIsWeb){
-  //   await Firebase.initializeApp(
-  //     options: const FirebaseOptions(
-  //         apiKey: "AIzaSyB1pKNjmmaeaD9-OqvTCs1bgWLSKUZ6nWQ",
-  //         authDomain: "chat-data-f147e.firebaseapp.com",
-  //         databaseURL: "https://chat-data-f147e-default-rtdb.firebaseio.com",
-  //         projectId: "chat-data-f147e",
-  //         storageBucket: "chat-data-f147e.appspot.com",
-  //         messagingSenderId: "738987421889",
-  //         appId: "1:738987421889:web:442ffd7499d12310096440"
-  //     )
-  //   );
-  // }else{
-  //   await Firebase.initializeApp();
-  // }
+  //await Firebase.initializeApp();
+  if(kIsWeb){
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: "AIzaSyB1pKNjmmaeaD9-OqvTCs1bgWLSKUZ6nWQ",
+          authDomain: "chat-data-f147e.firebaseapp.com",
+          databaseURL: "https://chat-data-f147e-default-rtdb.firebaseio.com",
+          projectId: "chat-data-f147e",
+          storageBucket: "chat-data-f147e.appspot.com",
+          messagingSenderId: "738987421889",
+          appId: "1:738987421889:web:442ffd7499d12310096440"
+      )
+    );
+  }else{
+    await Firebase.initializeApp();
+  }
 
   //var use = FirebaseAuth.instance.currentUser;
 

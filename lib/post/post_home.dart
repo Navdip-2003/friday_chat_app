@@ -85,28 +85,28 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
       get_pr = true;
     });
 
-    await Future.delayed(Duration(seconds: 1));
+   // await Future.delayed(Duration(seconds: 1));
     await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).startAfter([last_re!["time"]]).limit(2).get().then((value) {
-          if (value.docs.isEmpty) {
+        if (value.docs.isEmpty) {
+          setState(() {
+            more_pr = true;
+            get_pr = false;
+            return;
+          });
+        } else {
+          kl.addAll(value.docs);
+          last_re = value.docs[value.docs.length - 1];
+          print(value.docs.length);
+          if (value.docs.length < 2) {
             setState(() {
-              more_pr = true;
-              get_pr = false;
-              return;
-            });
-          } else {
-            kl.addAll(value.docs);
-            last_re = value.docs[value.docs.length - 1];
-            print(value.docs.length);
-            if (value.docs.length < 2) {
-              setState(() {
-                more_pr = false;
-              });
-            }
-            setState(() {
-              get_pr = false;
+              more_pr = false;
             });
           }
-        });
+          setState(() {
+            get_pr = false;
+          });
+        }
+      });
   }
 
   bool imgLoad = false;
@@ -171,7 +171,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
         ),
       ),
       body: Container(
-        //color: Colors.greenAccent,
+        color: Color.fromARGB(255, 242, 242, 242),
         height: size.height,
         width: size.width,
         child: Column(
@@ -276,35 +276,39 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                               backgroundImage: NetworkImage(snap.data!["image"]),
                                                             ),
                                                           ),
-                                                          Padding(
-                                                            padding: const EdgeInsets.all(8.0),
-                                                            child: Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Container(
-                                                                  width: size.width / 2,
-                                                                  child: Text(snap.data!["firstname"], style: TextStyle(fontFamily: "SansFont", fontWeight: FontWeight.w900, overflow: TextOverflow.ellipsis, fontSize: 15)),
-                                                                ),
-                                                                Row(
+                                                          Expanded(
+                                                            child: Container(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.all(8.0),
+                                                                child: Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                                   children: [
-                                                                    Icon(
-                                                                      Icons.location_on,
-                                                                      size: 15,
-                                                                    ),
-                                                                    Padding(padding: EdgeInsets.only(right: 3)),
                                                                     Container(
-                                                                      width: size.width / 1.8,
-                                                                      child: Text(
-                                                                        snapshot.data!["location"],
-                                                                        style: TextStyle(fontFamily: "SansFont", fontSize: 10, overflow: TextOverflow.ellipsis),
-                                                                      ),
+                                                                       width: size.width / 3,
+                                                                      child: Text(snap.data!["firstname"], style: TextStyle(fontFamily: "SansFont", fontWeight: FontWeight.w900, overflow: TextOverflow.ellipsis, fontSize: 15)),
                                                                     ),
+                                                                    snapshot.data!["location"] != "" ?   Row(
+                                                                      children: [
+                                                                        Icon(
+                                                                          Icons.location_on,
+                                                                          size: 15,
+                                                                        ),
+                                                                        Padding(padding: EdgeInsets.only(right: 3)),
+                                                                        Container(
+                                                                          width: size.width / 3,
+                                                                          child: Text(
+                                                                            snapshot.data!["location"],
+                                                                            style: TextStyle(fontFamily: "SansFont", fontSize: 10, overflow: TextOverflow.ellipsis),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ) : Container(),
                                                                   ],
                                                                 ),
-                                                              ],
+                                                              ),
                                                             ),
                                                           ),
-                                                          Expanded(child: Container()),
+                                                         // Expanded(child: Container()),
                                                           Text("$diff_time")
                                                         ],
                                                       ),
@@ -462,7 +466,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                                 // }
                                                                 return !isliked;
                                                               } else {
-                                                                await Directory("/FriDayChat").create();
+                                                               // await Directory("/FriDayChat").create();
                                                                 print("not exist");
                                                                 return !isliked;
                                                               }
@@ -534,6 +538,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                       ),
                                                     ),
                                                     Container(
+                                                      
                                                       padding: EdgeInsets.only(top: 10, right: 20, left: 20, bottom: 10),
                                                       width: size.width,
                                                       child: InkWell(
@@ -547,14 +552,14 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                               backgroundImage: imgLoad ? null : NetworkImage(image!),
                                                             ),
                                                             Padding(padding: EdgeInsets.only(right: 10)),
-                                                            Text("Add a comments...")
+                                                            Text("Add a comments...", style: TextStyle(color: Colors.black45),)
                                                           ],
                                                         ),
                                                       ),
                                                     ),
-                                                    Divider(
-                                                      height: 5,
-                                                    ),
+                                                    // Divider(
+                                                    //   height: 5,
+                                                    // ),
                                                     Padding(padding: EdgeInsets.all(5))
                                                   ],
                                                 ),
