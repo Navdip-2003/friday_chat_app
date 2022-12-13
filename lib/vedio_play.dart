@@ -7,10 +7,74 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:friday_chat_app/home_demo.dart';
-import 'package:friday_chat_app/post/show_post.dart';
+import 'package:friday_chat_app/post/setting_post/show_post.dart';
 import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+
+
+/// Stateful widget to fetch and then display video content.
+class VideoApp extends StatefulWidget {
+  const VideoApp({Key? key}) : super(key: key);
+
+  @override
+  _VideoAppState createState() => _VideoAppState();
+}
+
+class _VideoAppState extends State<VideoApp> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 3));
+    _controller = VideoPlayerController .network(
+        'https://firebasestorage.googleapis.com/v0/b/chat-data-f147e.appspot.com/o/Kedarnath%20%20Status%204k%20%F0%9F%A5%80%20-%204k%20%20Full%20Screen%20Kedarnath%20Status%20%F0%9F%98%8D%20-%20Kedarnath%20Temple%202022%20Special%20Status%20%F0%9F%99%8F.mp4?alt=media&token=aa1f6eb8-4b2a-4580-bbbb-44aee92fae38')
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Video Demo',
+      home: Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: _controller.value.isInitialized
+              ? 
+              AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                )
+              : Container(child: CircularProgressIndicator(),
+              ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _controller.value.isPlaying
+                  ? _controller.pause()
+                  : _controller.play();
+            });
+          },
+          child: Icon(
+            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+}
 
 class VideoPlayerScreen extends StatefulWidget {
   const VideoPlayerScreen({super.key});
@@ -31,7 +95,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     // offers several different constructors to play videos from assets, files,
     // or the internet.
     _controller = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+      'https://firebasestorage.googleapis.com/v0/b/chat-data-f147e.appspot.com/o/mahadev%20status%20__%20mahakal%20__%20bholenath%20status%20__%20full%20screen%20status%20__%20Insta%20story__%20whatsapp%20status.mp4?alt=media&token=256d6ea9-8ca3-4175-9bd8-426fa1db9ed4',
     );
 
     _initializeVideoPlayerFuture = _controller.initialize();

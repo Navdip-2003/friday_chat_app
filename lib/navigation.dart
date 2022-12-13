@@ -8,9 +8,11 @@ import 'package:friday_chat_app/navi_item/user_profile.dart';
 import 'package:friday_chat_app/pagination.dart';
 import 'package:friday_chat_app/post/pagination_comment.dart';
 import 'package:friday_chat_app/post/post_home.dart';
+import 'package:friday_chat_app/post/setting_post/Allpost.dart';
 import 'package:friday_chat_app/single_chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:friday_chat_app/story/storyhome.dart';
 import 'package:friday_chat_app/try.dart';
 import 'package:friday_chat_app/try1.dart';
 import 'package:friday_chat_app/variables.dart';
@@ -41,8 +43,11 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
     //comment_pagination(),
     //permission_handle(),
     //try1(),
-    chat_pagination(),
-
+   // chat_pagination(),
+   //VideoPlayerScreen(),
+   //VideoApp(),
+   // story_home(),
+   allpost(),
     post_home(),
     profile()
   ];
