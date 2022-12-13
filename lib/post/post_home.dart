@@ -58,11 +58,16 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
       isloading = true;
     });
 
-    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(3).get().then((value) {
+    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).limit(5).get().then((value) {
       if (value.docChanges.isNotEmpty) {
         kl = value.docs;
         last_re = value.docs[value.docs.length - 1];
       }
+      if (value.docs.length < 5) {
+            setState(() {
+              more_pr = false;
+            });
+          }
 
       // print(last_re!["time"]);
 
@@ -86,7 +91,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
     });
 
    // await Future.delayed(Duration(seconds: 1));
-    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).startAfter([last_re!["time"]]).limit(2).get().then((value) {
+    await _firestore.collection("cont_post").doc(_auth.currentUser!.uid).collection("all_post").orderBy("time", descending: true).startAfter([last_re!["time"]]).limit(5).get().then((value) {
         if (value.docs.isEmpty) {
           setState(() {
             more_pr = true;
@@ -97,7 +102,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
           kl.addAll(value.docs);
           last_re = value.docs[value.docs.length - 1];
           print(value.docs.length);
-          if (value.docs.length < 2) {
+          if (value.docs.length < 5) {
             setState(() {
               more_pr = false;
             });
@@ -537,6 +542,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           style: TextStyle(fontSize: 18, fontFamily: "SansFont"),
                                                         ),
                                                       ),
+                                                      Divider(),
                                                       Container(
                                                         
                                                         padding: EdgeInsets.only(top: 10, right: 20, left: 20, bottom: 10),

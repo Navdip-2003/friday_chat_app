@@ -4,6 +4,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/dispaly_homepage.dart';
 import 'package:friday_chat_app/home.dart';
+import 'package:friday_chat_app/navi_item/profile_user.dart';
 import 'package:friday_chat_app/navi_item/user_profile.dart';
 import 'package:friday_chat_app/pagination.dart';
 import 'package:friday_chat_app/post/pagination_comment.dart';
@@ -47,9 +48,10 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
    //VideoPlayerScreen(),
    //VideoApp(),
    // story_home(),
-   allpost(),
+   //allpost(),
+    profile_user(),
     post_home(),
-    profile()
+    profile_user()
   ];
   void setstatus(String state) async {
     await _store.collection("users").doc(_auth.currentUser?.uid).update({"status": state});

@@ -123,6 +123,7 @@ class _profileState extends State<profile> {
                               ],
                             ),
                           ),
+                         
                           SizedBox(
                             height: size.height / 50,
                           ),
@@ -282,6 +283,7 @@ class _profileState extends State<profile> {
                     }
                   },
                 )),
+        
         ),
       ),
     ));

@@ -54,226 +54,118 @@ class _contactState extends State<contact> with TickerProviderStateMixin, Widget
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    // return DefaultTabController(
 
-    //   initialIndex: 0,
-    //   length: 3,
-    //   child: Scaffold(
-    //     key: _globalKey,
-    //     drawer: drawer_home(),
-
-    //     appBar: AppBar(
-    //       elevation: 0,
-    //       backgroundColor: Colors.transparent,
-    //       flexibleSpace: Container(
-    //         color: Colors.white,
-
-    //       ),
-    //       toolbarHeight: size.height / 15,
-    //        actions: [
-
-    //         IconButton(
-    //           onPressed: (){
-    //             showSearch(context: context, delegate: con_search(tab_index));
-    //           },
-    //           icon: Icon(Icons.search,color: Colors.black)
-    //         )
-
-    //       ],
-    //       leading: IconButton(
-    //         onPressed: (){
-    //           _globalKey.currentState?.openDrawer();
-
-    //         },
-    //         icon: Icon(Icons.menu , color: Colors.black54,)
-    //       ),
-    //       title: Text('Messages' , style: TextStyle(
-    //                 fontSize:  25,fontWeight: FontWeight.w500,color: Colors.black
-    //                   )),
-
-    //       bottom: TabBar(
-    //         onTap: (value) {
-    //           tab_index = value;
-    //           print(tab_index);
-    //         },
-    //         indicatorColor: Colors.black26,
-    //         indicatorSize: TabBarIndicatorSize.label,
-    //         controller: tabcon,
-    //         labelColor: Colors.black,
-    //         unselectedLabelColor: Colors.black45,
-    //         tabs: [
-    //           Tab(child: Container(child: Row(
-    //            mainAxisAlignment: MainAxisAlignment.center,
-    //            children: [
-    //              Icon(Icons.person, size: 17),
-    //              SizedBox(width: size.width / 50,),
-    //              Text("Chats" ,style: TextStyle(fontSize: 15),)
-    //            ],
-    //            ),),
-    //         ),
-    //          Tab(child: Container(child: Row(
-    //              mainAxisAlignment: MainAxisAlignment.center,
-    //              children: [
-    //                Icon(Icons.people, size: 17),
-    //                SizedBox(width: size.width / 50,),
-    //                Text("Groups" ,style: TextStyle(fontSize: 15),)
-    //              ],
-    //              ),),
-    //           ),
-    //           Tab(
-    //             icon: Icon(Icons.brightness_5_sharp),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //     body: Padding(
-    //       padding: const EdgeInsets.only(right: 5 ,left: 5 , top: 10),
-    //       child: TabBarView(
-    //         controller: tabcon,
-    //         children: [
-    //           chats(),
-    //           home_group(),
-
-    //           Center(
-    //             child: Text("It's sunny here"),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
-
-    return Scaffold(
-      key: _globalKey,
-      drawer: drawer_home(),
-      body: WillPopScope(
-        onWillPop: () => onbackbutton(context),
-        child: Container(
-          height: size.height,
-          width: size.width,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: size.height / 25),
-                // height: size.height / 5.5,
-                child: Column(
-                  children: [
-                    Row(
-                      //crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              _globalKey.currentState?.openDrawer();
-                            },
-                            icon: Icon(Icons.menu)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 2),
-                          child: Container(
-                            child: Text(
-                              "Messages",
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
+    return SafeArea(
+      top: true,
+      child: Scaffold(
+        key: _globalKey,  
+        drawer: drawer_home(),
+        body: WillPopScope(
+          onWillPop: () => onbackbutton(context),
+          child: Container(
+            height: size.height,
+            width: size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  child: Column(
+                    children: [
+                      Row(
+                     
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                _globalKey.currentState?.openDrawer();
+                              },
+                              icon: Icon(Icons.menu)),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 2),
+                            child: Container(
+                              child: Text(
+                                "Messages",
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Expanded(child: Container()),
-                        IconButton(
-                            onPressed: () {
-                              showSearch(context: context, delegate: con_search(1));
+                          Expanded(child: Container()),
+                          IconButton(
+                              onPressed: () {
+                                showSearch(context: context, delegate: con_search(1));
+                              },
+                              icon: Icon(Icons.search, color: Colors.black)),
+    
+                        ],
+                      ),
+                
+                      Container(
+                        child: TabBar(
+                            onTap: (index) {
+                              print(index);
                             },
-                            icon: Icon(Icons.search, color: Colors.black)),
-
-                        // Padding(
-                        //   padding: const EdgeInsets.only(right: 7),
-                        //   child: IconButton(
-                        //     onPressed: (){
-                        //       tabcon.animateTo(2);
-
-                        //     },
-                        //      icon: Icon(Icons.more_vert,color: Colors.black)
-                        //   ),
-                        // )
-                      ],
-                    ),
-                    SizedBox(
-                      height: size.height / 60,
-                    ),
-                    Container(
-                      child: TabBar(
-                          onTap: (index) {
-                            print(index);
-                          },
-                          indicatorColor: Colors.black26,
-                          indicatorSize: TabBarIndicatorSize.label,
-                          controller: tbcon,
-                          labelColor: Colors.black,
-                          unselectedLabelColor: Colors.black45,
-                          tabs: [
-                            Tab(
-                              child: Container(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.person, size: 17),
-                                    SizedBox(
-                                      width: size.width / 50,
-                                    ),
-                                    Text(
-                                      "Chats",
-                                      style: TextStyle(fontSize: 15),
-                                    )
-                                  ],
+                            indicatorColor: Colors.black26,
+                            indicatorSize: TabBarIndicatorSize.label,
+                            controller: tbcon,
+                            labelColor: Colors.black,
+                            unselectedLabelColor: Colors.black45,
+                            tabs: [
+                              Tab(
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.person, size: 17),
+                                      SizedBox(
+                                        width: size.width / 50,
+                                      ),
+                                      Text(
+                                        "Chats",
+                                        style: TextStyle(fontSize: 15),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            Tab(
-                              child: Container(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.people, size: 17),
-                                    SizedBox(
-                                      width: size.width / 50,
-                                    ),
-                                    Text(
-                                      "Groups",
-                                      style: TextStyle(fontSize: 15),
-                                    )
-                                  ],
+                              Tab(
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.people, size: 17),
+                                      SizedBox(
+                                        width: size.width / 50,
+                                      ),
+                                      Text(
+                                        "Groups",
+                                        style: TextStyle(fontSize: 15),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ]),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Container(
-                    color: Colors.red,
-                    child: TabBarView(
-                      controller: tbcon,
-                      children: [chats(), home_group()],
-                    ),
+                            ]),
+                      )
+                    ],
                   ),
                 ),
-              )
-              // Container(
-              //   padding: EdgeInsets.only(right: 5, left: 5),
-              //   width: size.width,
-              //   height: size.height - (size.height / 4.2),
-              //   child: TabBarView(controller: tbcon, children: [
-              //     chats(),
-              //     home_group(),
-              //   ]),
-              // )
-            ],
+                Expanded(child: Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.white24,
+                  child: TabBarView(
+                    controller: tbcon,
+                    children: [
+                      chats(),
+                      home_group()
+    
+                    ],
+                  ) ,
+                ))
+              ],
+            ),
           ),
         ),
       ),

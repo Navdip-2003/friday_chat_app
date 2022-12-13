@@ -177,81 +177,84 @@ void update_data() async{
                         bottom: 10,
                         right: 10,
 
-                        child: IconButton(onPressed: (){
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (Builder){
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  
-                                ),
-                                
-                                height: size.height / 5,
-                                child: Container(
-                                  child: Column(
+                        child: CircleAvatar(
+                          backgroundColor: Color.fromARGB(255, 0, 95, 3),
+                          child: IconButton(onPressed: (){
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (Builder){
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
                                     
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("Choose Profile Photo" , style: (TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.w500
-                                        
-                                      )),),
-                                      Padding(
-                                        padding: const EdgeInsets.all(30),
-                                        child: Container(
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              InkWell(
-                                                onTap: (){
-                                                  image_picker(ImageSource.camera);
-                                                  Navigator.pop(context);
-
-                                                },
-                                                child: Container(
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.camera),
-                                                      SizedBox(width: size.width / 55,),
-                                                      Text("Camera")
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(width: size.width / 20,),
-                                              InkWell(
-                                                onTap: (){
-                                                  image_picker(ImageSource.gallery);
-                                                  Navigator.pop(context);
-
-                                                },
-                                                child: Container(
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.image),
-                                                      SizedBox(width: size.width / 55,),
-                                                      Text("Gallery")
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-
-                                        ),
-                                      )
-
-                                    ],
                                   ),
-                                ),
-                              );
-                            }
-                          );
-
-
-                        }, 
-                         color: Colors.grey, icon: Icon(Icons.edit ) ,)
+                                  
+                                  height: size.height / 5,
+                                  child: Container(
+                                    child: Column(
+                                      
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text("Choose Profile Photo" , style: (TextStyle(
+                                          fontSize: 18, fontWeight: FontWeight.w500
+                                          
+                                        )),),
+                                        Padding(
+                                          padding: const EdgeInsets.all(30),
+                                          child: Container(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                InkWell(
+                                                  onTap: (){
+                                                    image_picker(ImageSource.camera);
+                                                    Navigator.pop(context);
+                        
+                                                  },
+                                                  child: Container(
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.camera),
+                                                        SizedBox(width: size.width / 55,),
+                                                        Text("Camera")
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: size.width / 20,),
+                                                InkWell(
+                                                  onTap: (){
+                                                    image_picker(ImageSource.gallery);
+                                                    Navigator.pop(context);
+                        
+                                                  },
+                                                  child: Container(
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.image),
+                                                        SizedBox(width: size.width / 55,),
+                                                        Text("Gallery")
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                        
+                                          ),
+                                        )
+                        
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                            );
+                        
+                        
+                          }, 
+                            icon: Icon(Icons.image ) ,),
+                        )
                         
                       ),
                     ],

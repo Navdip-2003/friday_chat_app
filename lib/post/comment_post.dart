@@ -73,201 +73,202 @@ class _comment_postState extends State<comment_post> {
     if (rang.viewInsets.bottom > 0) {
       scrolltobottom();
     }
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: false,
-      body: Hero(
-        tag: "comment",
-        child: Container(
-            height: size.height,
-            width: size.width,
-            //   color: Colors.amber,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: size.height / 30,
-                ),
-                Container(
-                  //  color: Colors.green,
-                  height: size.height / 12,
-                  child: Row(
-                    children: [
-                      BackButton(
-                        color: Colors.black,
-                      ),
-                      Text("Comments", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 20))
-                    ],
-                  ),
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 2,
-                  color: Colors.black38,
-                ),
-                Expanded(
-                    child: isload
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : Container(
-                            // height: rang.size.height - (rang.viewInsets.bottom + rang.size.height / 8),
-                            child: StreamBuilder(
-                              stream: _firestore.collection("comment").doc(post_id).collection("comment").orderBy("time", descending: false).snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return ListView.builder(
-                                    controller: sc,
-                                    itemCount: snapshot.data!.docs.length,
-                                    itemBuilder: (context, index) {
-                                      final Timestamp timestamp = snapshot.data!.docs[index]["time"] as Timestamp;
-                                      final DateTime dateTime = timestamp.toDate();
-                                      final dateString = DateFormat('kk:mm a').format(dateTime);
-                                      getTime(time) {
-                                        if (DateTime.now().difference(time).inMinutes < 2) {
-                                          return "Now";
-                                        } else if (DateTime.now().difference(time).inMinutes < 60) {
-                                          return "${DateTime.now().difference(time).inHours} min";
-                                        } else if (DateTime.now().difference(time).inMinutes < 1440) {
-                                          return "${DateTime.now().difference(time).inHours} hours";
-                                        } else if (DateTime.now().difference(time).inMinutes > 1440) {
-                                          return "${DateTime.now().difference(time).inDays} days";
-                                        }
-                                      }
-
-                                      var diff_time = getTime(dateTime);
-
-                                      return StreamBuilder(
-                                        stream: _firestore.collection("users").doc(snapshot.data!.docs[index]["uid"]).snapshots(),
-                                        builder: (context, snap) {
-                                          if (snap.hasData) {
-                                            return Container(
-                                                padding: EdgeInsets.all(10),
-                                                width: size.width,
-                                                // color: Colors.blue,
-                                                child: Column(
-                                                  children: [
-                                                    Container(
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Flexible(
-                                                            flex: 1,
-                                                            child: CircleAvatar(
-                                                              radius: 23,
-                                                              backgroundImage: NetworkImage(snap.data!["image"]),
-                                                            ),
-                                                          ),
-                                                          Flexible(
-                                                            flex: 4,
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.only(left: 10),
-                                                              child: Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      Container(
-                                                                        child: Text(
-                                                                          snap.data!["firstname"],
-                                                                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(child: Container()),
-                                                                      Text(
-                                                                        "$diff_time",
-                                                                        style: TextStyle(fontSize: 13, color: Colors.black54),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                  Container(
-                                                                    padding: EdgeInsets.only(top: 5),
-                                                                    // width: size.width / 1.3,
-                                                                    //  color: Colors.redAccent,
-                                                                    child: Text(
-                                                                      snapshot.data!.docs[index]["comment"],
-                                                                      style: TextStyle(fontSize: 13),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Divider(
-                                                      indent: 5,
-                                                      thickness: 2,
-                                                    ),
-                                                    // Padding(padding: EdgeInsets.all(4)),
-                                                  ],
-                                                ));
-                                          } else {
-                                            return Container();
-                                          }
-                                        },
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                              },
-                            ),
-                          )),
-                Container(
-                  height: size.height / 10,
-                  width: size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Container(
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                              flex: 1,
-                              child: imgLoad
-                                  ? CircleAvatar(
-                                      radius: 20,
-                                      backgroundColor: Colors.white12,
-                                    )
-                                  : CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: NetworkImage(image!),
-                                    )),
-                          Padding(padding: EdgeInsets.all(10)),
-                          Flexible(
-                              flex: 2,
-                              child: TextField(
-                                controller: comment,
-                                maxLines: null,
-                                keyboardType: TextInputType.multiline,
-                                decoration: InputDecoration(
-                                    suffixIcon: TextButton(
-                                      onPressed: () {
-                                        if (comment.text != "") {
-                                          add_post();
-                                        }
-                                      },
-                                      child: Text("POST"),
-                                    ),
-                                    isCollapsed: true,
-                                    contentPadding: EdgeInsets.all(10),
-                                    focusColor: Colors.white,
-                                    hintText: "Add Comments ..."),
-                              ))
-                        ],
-                      ),
+    return SafeArea(
+      top: true,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        extendBody: false,
+        body: Hero(
+          tag: "comment",
+          child: Container(
+              height: size.height,
+              width: size.width,
+              //   color: Colors.amber,
+              child: Column(
+                children: [
+                  
+                  Container(
+                    //  color: Colors.green,
+                    height: size.height / 12,
+                    child: Row(
+                      children: [
+                        BackButton(
+                          color: Colors.black,
+                        ),
+                        Text("Comments", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 20))
+                      ],
                     ),
                   ),
-                )
-              ],
-            )),
+                  Divider(
+                    height: 1,
+                    thickness: 2,
+                    color: Colors.black38,
+                  ),
+                  Expanded(
+                      child: isload
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : Container(
+                              // height: rang.size.height - (rang.viewInsets.bottom + rang.size.height / 8),
+                              child: StreamBuilder(
+                                stream: _firestore.collection("comment").doc(post_id).collection("comment").orderBy("time", descending: false).snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return ListView.builder(
+                                      controller: sc,
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        final Timestamp timestamp = snapshot.data!.docs[index]["time"] as Timestamp;
+                                        final DateTime dateTime = timestamp.toDate();
+                                        final dateString = DateFormat('kk:mm a').format(dateTime);
+                                        getTime(time) {
+                                          if (DateTime.now().difference(time).inMinutes < 2) {
+                                            return "Now";
+                                          } else if (DateTime.now().difference(time).inMinutes < 60) {
+                                            return "${DateTime.now().difference(time).inHours} min";
+                                          } else if (DateTime.now().difference(time).inMinutes < 1440) {
+                                            return "${DateTime.now().difference(time).inHours} hours";
+                                          } else if (DateTime.now().difference(time).inMinutes > 1440) {
+                                            return "${DateTime.now().difference(time).inDays} days";
+                                          }
+                                        }
+    
+                                        var diff_time = getTime(dateTime);
+    
+                                        return StreamBuilder(
+                                          stream: _firestore.collection("users").doc(snapshot.data!.docs[index]["uid"]).snapshots(),
+                                          builder: (context, snap) {
+                                            if (snap.hasData) {
+                                              return Container(
+                                                  padding: EdgeInsets.all(10),
+                                                  width: size.width,
+                                                  // color: Colors.blue,
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Flexible(
+                                                              flex: 1,
+                                                              child: CircleAvatar(
+                                                                radius: 23,
+                                                                backgroundImage: NetworkImage(snap.data!["image"]),
+                                                              ),
+                                                            ),
+                                                            Flexible(
+                                                              flex: 4,
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.only(left: 10),
+                                                                child: Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Row(
+                                                                      children: [
+                                                                        Container(
+                                                                          child: Text(
+                                                                            snap.data!["firstname"],
+                                                                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(child: Container()),
+                                                                        Text(
+                                                                          "$diff_time",
+                                                                          style: TextStyle(fontSize: 13, color: Colors.black54),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                    Container(
+                                                                      padding: EdgeInsets.only(top: 5),
+                                                                      // width: size.width / 1.3,
+                                                                      //  color: Colors.redAccent,
+                                                                      child: Text(
+                                                                        snapshot.data!.docs[index]["comment"],
+                                                                        style: TextStyle(fontSize: 13),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Divider(
+                                                        indent: 5,
+                                                        thickness: 2,
+                                                      ),
+                                                      // Padding(padding: EdgeInsets.all(4)),
+                                                    ],
+                                                  ));
+                                            } else {
+                                              return Container();
+                                            }
+                                          },
+                                        );
+                                      },
+                                    );
+                                  } else {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                },
+                              ),
+                            )),
+                  Container(
+                    height: size.height / 10,
+                    width: size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Container(
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                                flex: 1,
+                                child: imgLoad
+                                    ? CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: Colors.white12,
+                                      )
+                                    : CircleAvatar(
+                                        radius: 20,
+                                        backgroundImage: NetworkImage(image!),
+                                      )),
+                            Padding(padding: EdgeInsets.all(10)),
+                            Flexible(
+                                flex: 2,
+                                child: TextField(
+                                  controller: comment,
+                                  maxLines: null,
+                                  keyboardType: TextInputType.multiline,
+                                  decoration: InputDecoration(
+                                      suffixIcon: TextButton(
+                                        onPressed: () {
+                                          if (comment.text != "") {
+                                            add_post();
+                                          }
+                                        },
+                                        child: Text("POST"),
+                                      ),
+                                      isCollapsed: true,
+                                      contentPadding: EdgeInsets.all(10),
+                                      focusColor: Colors.white,
+                                      hintText: "Add Comments ..."),
+                                ))
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )),
+        ),
       ),
     );
   }
