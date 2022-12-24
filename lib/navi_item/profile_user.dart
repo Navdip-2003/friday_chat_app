@@ -6,6 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:friday_chat_app/navi_item/edit_profile.dart';
+import 'package:friday_chat_app/open_image.dart';
 import 'package:friday_chat_app/post/add_post.dart';
 import 'package:friday_chat_app/post/setting_post/Allpost.dart';
 import 'package:friday_chat_app/post/setting_post/show_post.dart';
@@ -57,13 +58,19 @@ class _profile_userState extends State<profile_user> {
                                         flex: 2,
                                         child:
                                         Container(
-                                          child: CircleAvatar(
-                                            radius: 46,
-                                            backgroundColor: Color.fromARGB(255, 0, 68, 1),
+                                          
+                                          child: InkWell(
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>open_image(url: snaps.data!["image"],)));
+                                            },
                                             child: CircleAvatar(
-                                              radius: 44,
-                                              backgroundColor: Colors.white,
-                                              backgroundImage: NetworkImage(snaps.data!["image"])
+                                              radius: 46,
+                                              backgroundColor: Color.fromARGB(255, 0, 68, 1),
+                                              child: CircleAvatar(
+                                                radius: 44,
+                                                backgroundColor: Colors.white,
+                                                backgroundImage: NetworkImage(snaps.data!["image"])
+                                              ),
                                             ),
                                           ),
                                         ),

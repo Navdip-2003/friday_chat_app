@@ -32,6 +32,7 @@ Future<User?> createaccount(String name, String email ,String password, BuildCon
         "image": blank_image,
         "nick_name":""
       });
+      //await _firestore.collection("cont_post").doc(_auth.currentUser!.uid);
       return user;
     }else{
       print(user);

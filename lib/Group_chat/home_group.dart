@@ -23,11 +23,14 @@ class _home_groupState extends State<home_group> {
   var _firestore = FirebaseFirestore.instance;
   var _auth = FirebaseAuth.instance;
   bool isloading = true;
+  ScrollController? sc;
   
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    sc = ScrollController();
+    
   
   }
   @override

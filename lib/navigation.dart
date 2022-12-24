@@ -4,6 +4,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/dispaly_homepage.dart';
 import 'package:friday_chat_app/home.dart';
+import 'package:friday_chat_app/image_compressed.dart';
 import 'package:friday_chat_app/navi_item/profile_user.dart';
 import 'package:friday_chat_app/navi_item/user_profile.dart';
 import 'package:friday_chat_app/pagination.dart';
@@ -13,6 +14,8 @@ import 'package:friday_chat_app/post/setting_post/Allpost.dart';
 import 'package:friday_chat_app/single_chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:friday_chat_app/story/homest.dart';
+import 'package:friday_chat_app/story/st_home.dart';
 import 'package:friday_chat_app/story/storyhome.dart';
 import 'package:friday_chat_app/try.dart';
 import 'package:friday_chat_app/try1.dart';
@@ -49,7 +52,9 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
    //VideoApp(),
    // story_home(),
    //allpost(),
-    profile_user(),
+    //MyHomePage(),
+   // homest(),
+   compressed_image(),
     post_home(),
     profile_user()
   ];

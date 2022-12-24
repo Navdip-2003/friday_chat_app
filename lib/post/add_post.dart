@@ -67,6 +67,8 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
       "description": des.text,
       "location": loc.text,
       "post": image_url,
+      "like_enable": true,
+      "comment_enable": true,
     }).then((value) {
       print("post successfully done !!");
     });

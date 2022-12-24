@@ -164,6 +164,33 @@ class _show_postState extends State<show_post> {
     });
   }
 
+  void like_enable(like_enable) async {
+    print(like_enable);
+    Navigator.pop(context);
+    if(like_enable){
+      await _firestore.collection("post").doc(_auth.currentUser!.uid).collection("story").doc(widget.postid).update({
+      "like_enable" : false
+
+    });
+
+    }else{
+      await _firestore.collection("post").doc(_auth.currentUser!.uid).collection("story").doc(widget.postid).update({
+      "like_enable" : true
+      });
+    }
+  }
+  void comment_enable(comment_enable) async {
+    Navigator.pop(context);
+    if(comment_enable){
+      await _firestore.collection("post").doc(_auth.currentUser!.uid).collection("story").doc(widget.postid).update({
+      "comment_enable" : false
+    });
+    }else{
+      await _firestore.collection("post").doc(_auth.currentUser!.uid).collection("story").doc(widget.postid).update({
+      "comment_enable" : true
+      });
+    }  
+  }
   List ppdata = [];
   List postdata = [];
   void get_userdata() async {
@@ -365,7 +392,7 @@ class _show_postState extends State<show_post> {
                                                                   context: context,
                                                                   builder: (context) {
                                                                     return Container(
-                                                                      height: size.height / 2.5,
+                                                                      height: size.height / 2,
                                                                       child: Column(
                                                                         children: [
                                                                           Icon(
@@ -453,6 +480,36 @@ class _show_postState extends State<show_post> {
                                                                                   )
                                                                                 ],
                                                                               ),
+                                                                              Padding(padding: EdgeInsets.all(10)),
+                                                                              Column(
+                                                                                children: [
+                                                                                  CircleAvatar(
+                                                                                    radius: 26.3,
+                                                                                    backgroundColor: Colors.black,
+                                                                                    child: CircleAvatar(
+                                                                                        backgroundColor: Colors.white,
+                                                                                        radius: 25,
+                                                                                        child: IconButton(
+                                                                                          onPressed: () {
+                                                                                            like_enable(snapshot.data!["like_enable"]);
+                                                                                          },
+                                                                                          icon: snapshot.data!["like_enable"] ?
+                                                                                            Icon(
+                                                                                              Icons.favorite,
+                                                                                              color: Colors.black,
+                                                                                              size: 25,
+                                                                                            ) :
+                                                                                            Icon(Icons.close , size: 25, color: Colors.black,), 
+                                                                                            
+                                                                                        )
+                                                                                      ),
+                                                                                  ),
+                                                                                  Padding(
+                                                                                    padding: const EdgeInsets.all(3.0),
+                                                                                    child: Text("Like Show"),
+                                                                                  )
+                                                                                ],
+                                                                              ),
                                                                             ],
                                                                           ),
                                                                           Padding(
@@ -493,6 +550,30 @@ class _show_postState extends State<show_post> {
                                                                               title: Text(
                                                                                 "Set Profile Picture",
                                                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          Container(
+                                                                            width: size.width,
+                                                                            child: ListTile(
+                                                                              onTap: () {
+                                                                                comment_enable(snapshot.data!["comment_enable"]);
+                                                                                
+                                                                              },
+                                                                              leading: Image.asset("asset/comm.png", scale: 15,),
+                                                                              // Icon(
+                                                                              //   Icons.comment_bank,
+                                                                              //   size: 30,
+                                                                              //   color: Color.fromARGB(255, 2, 2, 2),
+                                                                              // ),
+                                                                              title: snapshot.data!["comment_enable"] ?
+                                                                              Text(
+                                                                                "Comment Show - Disable",
+                                                                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                                                              ): 
+                                                                               Text(
+                                                                                "Comment Show - Enable",
+                                                                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                                                                               ),
                                                                             ),
                                                                           ),
