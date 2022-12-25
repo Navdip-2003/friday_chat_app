@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,15 @@ class _edit_profileState extends State<edit_profile> with SingleTickerProviderSt
         //upload_image();
       });
       await crop_image();
+      var size_img = pick_image!.lengthSync() / 1024;
+      if(size_img > 1000) {
+        print("image size is greater than 2");
+        await compressed_images();
+      }else{
+        print("image is less than 2");
+        
+      }
+    
     }
   }
   Future crop_image() async{
@@ -57,6 +67,18 @@ class _edit_profileState extends State<edit_profile> with SingleTickerProviderSt
     });
     }
     
+  }
+  Future<void> compressed_images() async{
+
+    pick_image = await FlutterNativeImage.compressImage(pick_image!.path , quality: 50);
+    if(pick_image != null){
+      setState(() {
+        pick_image = File(pick_image!.path);
+        var size =pick_image!.lengthSync() / 1024;
+        log("compressed size : $size KB");
+        
+      });
+    }
   }
   
   Future upload_image() async {
@@ -259,62 +281,71 @@ class _edit_profileState extends State<edit_profile> with SingleTickerProviderSt
                                   ),
                                   
                                   height: size.height / 5,
-                                  child: Container(
-                                    child: Column(
-                                      
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text("Choose Profile Photo" , style: (TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.w500
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: size.width,
+                                        
+                                        child: Icon(Icons.horizontal_rule_sharp, size: 30,),
+                                      ),
+                                      Container(
+                                        child: Column(
                                           
-                                        )),),
-                                        Padding(
-                                          padding: const EdgeInsets.all(30),
-                                          child: Container(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                InkWell(
-                                                  onTap: (){
-                                                    image_picker(ImageSource.camera);
-                                                    Navigator.pop(context);
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text("Choose Profile Photo" , style: (TextStyle(
+                                              fontSize: 18, fontWeight: FontWeight.w500
+                                              
+                                            )),),
+                                            Padding(
+                                              padding: const EdgeInsets.all(30),
+                                              child: Container(
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: (){
+                                                        image_picker(ImageSource.camera);
+                                                        Navigator.pop(context);
                         
-                                                  },
-                                                  child: Container(
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(Icons.camera),
-                                                        SizedBox(width: size.width / 55,),
-                                                        Text("Camera")
-                                                      ],
+                                                      },
+                                                      child: Container(
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(Icons.camera),
+                                                            SizedBox(width: size.width / 55,),
+                                                            Text("Camera")
+                                                          ],
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
+                                                    SizedBox(width: size.width / 20,),
+                                                    InkWell(
+                                                      onTap: (){
+                                                        image_picker(ImageSource.gallery);
+                                                        Navigator.pop(context);
+                        
+                                                      },
+                                                      child: Container(
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(Icons.image),
+                                                            SizedBox(width: size.width / 55,),
+                                                            Text("Gallery")
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
-                                                SizedBox(width: size.width / 20,),
-                                                InkWell(
-                                                  onTap: (){
-                                                    image_picker(ImageSource.gallery);
-                                                    Navigator.pop(context);
                         
-                                                  },
-                                                  child: Container(
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(Icons.image),
-                                                        SizedBox(width: size.width / 55,),
-                                                        Text("Gallery")
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
+                                              ),
+                                            )
                         
-                                          ),
-                                        )
-                        
-                                      ],
-                                    ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               }

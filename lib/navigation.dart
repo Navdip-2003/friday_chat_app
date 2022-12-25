@@ -7,6 +7,7 @@ import 'package:friday_chat_app/home.dart';
 import 'package:friday_chat_app/image_compressed.dart';
 import 'package:friday_chat_app/navi_item/profile_user.dart';
 import 'package:friday_chat_app/navi_item/user_profile.dart';
+import 'package:friday_chat_app/overlay_image.dart';
 import 'package:friday_chat_app/pagination.dart';
 import 'package:friday_chat_app/post/pagination_comment.dart';
 import 'package:friday_chat_app/post/post_home.dart';
@@ -54,7 +55,8 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
    //allpost(),
     //MyHomePage(),
    // homest(),
-   compressed_image(),
+  // compressed_image(),
+  overlay_image(),
     post_home(),
     profile_user()
   ];

@@ -1,6 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/variables.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -27,6 +30,7 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
   TextEditingController des = new TextEditingController();
   TextEditingController loc = new TextEditingController();
   File? _image;
+  File? _final_image;
   ImagePicker _picker = ImagePicker();
 
   var filename;
@@ -37,7 +41,41 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
         _image = File(img.path);
         filename = img.path.split('/').last;
         print(filename);
-        upload_image();
+        var size = _image!.lengthSync() / 1024;
+        log("Original size: $size kb");
+       
+      });
+      await crop_image();
+      var size_img = _image!.lengthSync() / 1024;
+      if(size_img > 1000) {
+        print("image size is greater than 2");
+        await compressed_images();
+      }else{
+        print("image is less than 2");
+      }
+      await upload_image();
+    }
+  }
+  
+  Future crop_image() async{
+    CroppedFile? crop_img = await ImageCropper().cropImage(sourcePath: _image!.path);
+    if(crop_img !=  null){
+      setState(() {
+        _image = File(crop_img.path);
+      });
+    }
+    
+  }
+  
+  Future<void> compressed_images() async{
+
+    final comp_image = await FlutterNativeImage.compressImage(_image!.path , quality: 50);
+    if(comp_image != null){
+      setState(() {
+        _final_image = File(comp_image.path);
+        var size =_final_image!.lengthSync() / 1024;
+        log("compressed size : $size KB");
+        
       });
     }
   }
@@ -82,10 +120,10 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
   }
 
   String image_url = "";
-  void upload_image() async {
+  Future upload_image() async {
     isload = true;
     var ref = FirebaseStorage.instance.ref().child("post_image").child(filename);
-    var up_image = await ref.putFile(_image!);
+    var up_image = await ref.putFile(_final_image!);
     image_url = await up_image.ref.getDownloadURL();
     print(image_url);
     setState(() {
@@ -124,7 +162,7 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
                   Expanded(child: Container()),
                   IconButton(
                       onPressed: () {
-                        if (_image != null) {
+                        if (_final_image != null) {
                           upload_post();
                         } else {
                           show_snak(context, "Please Enter Image For Post !!");
