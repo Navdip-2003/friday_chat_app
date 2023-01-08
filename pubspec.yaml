@@ -65,7 +65,9 @@ dependencies:
   #audio player
   just_audio: ^0.9.31
   audioplayers: ^1.2.0
-  
+
+  #auto size text
+  auto_size_text: ^3.0.0  
   
 
 

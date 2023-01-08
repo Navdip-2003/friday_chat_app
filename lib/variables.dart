@@ -91,5 +91,19 @@ List Online_Images = [
   "https://images.unsplash.com/photo-1671733049649-9e4d534c9796?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1MHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60"
   "https://images.unsplash.com/photo-1661956600684-97d3a4320e45?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=500&q=60",
 ];
+
+
+String format_time(Duration duration){
+  String twodigit(int n) => n.toString().padLeft(2,'0');
+  final hours = twodigit(duration.inHours);
+  final minutes = twodigit(duration.inMinutes.remainder(60));
+  final seconds = twodigit(duration.inSeconds.remainder(60));
+
+  return [
+    if(duration.inHours > 0 ) hours,
+    minutes , seconds ,
+
+  ].join(':');
+}
   
 

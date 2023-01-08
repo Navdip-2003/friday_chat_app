@@ -21,7 +21,7 @@ class _registerState extends State<register> with SingleTickerProviderStateMixin
   TextEditingController email = new TextEditingController();
   TextEditingController password = new TextEditingController();
   var g_key = GlobalKey<FormState>();
-    late AnimationController cont;
+  late AnimationController cont;
 
   @override
   void initState() {
