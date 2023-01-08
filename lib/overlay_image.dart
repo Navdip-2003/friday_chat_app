@@ -155,18 +155,21 @@ _createpopupcontent(String url, BuildContext context){
   return showDialog(
     context: context, 
     builder: (context) {
-      return Container(
-        width: MediaQuery.of(context).size.width ,
-        height: MediaQuery.of(context).size.height / 1.5 ,
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.network(url , fit: BoxFit.fitHeight,)
-
-            ],
+      return AspectRatio(
+        aspectRatio: 3/2,
+        child: Container(
+          // width: MediaQuery.of(context).size.width ,
+          // height: MediaQuery.of(context).size.height / 1.5 ,
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.network(url , fit: BoxFit.fitHeight,)
+      
+              ],
+            ),
           ),
         ),
       );

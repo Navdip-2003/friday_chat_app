@@ -2,6 +2,8 @@
 
 
 
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:friday_chat_app/home.dart';
 import 'package:friday_chat_app/log/login.dart';
 import 'package:friday_chat_app/variables.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 
 
 Future<User?> createaccount(String name, String email ,String password, BuildContext context) async{
@@ -125,4 +128,12 @@ Future<void> signout()async{
   }catch(e){
     print(e);
   }
+}
+
+void saved_image_galary(String path, BuildContext context){
+  GallerySaver.saveImage(path).then((value) {
+      log("images save status : $value");
+      show_snak(context, "Download image done !!");
+    });
+
 }

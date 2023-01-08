@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:friday_chat_app/advance_feature/audio_player.dart';
+import 'package:friday_chat_app/advance_feature/whether_city.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/dispaly_homepage.dart';
 import 'package:friday_chat_app/home.dart';
@@ -12,6 +14,7 @@ import 'package:friday_chat_app/pagination.dart';
 import 'package:friday_chat_app/post/pagination_comment.dart';
 import 'package:friday_chat_app/post/post_home.dart';
 import 'package:friday_chat_app/post/setting_post/Allpost.dart';
+import 'package:friday_chat_app/ratio_image.dart';
 import 'package:friday_chat_app/single_chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -56,7 +59,10 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
     //MyHomePage(),
    // homest(),
   // compressed_image(),
-  overlay_image(),
+  //overlay_image(),
+ // ratio_image(),
+   // whether_city(),
+   audio_player(),
     post_home(),
     profile_user()
   ];

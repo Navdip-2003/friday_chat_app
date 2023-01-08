@@ -1,12 +1,19 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
+import 'package:friday_chat_app/log/login.dart';
+import 'package:friday_chat_app/methods.dart';
 import 'package:friday_chat_app/policies.dart';
+import 'package:gallery_saver/files.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 class drawer_home extends StatefulWidget {
   const drawer_home({super.key});
 
@@ -15,6 +22,8 @@ class drawer_home extends StatefulWidget {
 }
 
 class _drawer_homeState extends State<drawer_home> {
+  FirebaseFirestore _store = FirebaseFirestore.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   String greetingMessage(){
 
     var timeNow = DateTime.now().hour;
@@ -28,6 +37,37 @@ class _drawer_homeState extends State<drawer_home> {
     } else {
     return 'Good Night';
     }
+  }
+  var whether_data;
+  var whether_current;
+  bool isgetdata = false;
+  var city = "amreli";
+  Future get_city_whether() async{
+    setState(() {
+      isgetdata = true;
+    });
+      
+      var res = await http.get(Uri.parse("https://api.weatherapi.com/v1/current.json?key=25a1ca48c9224a6aa79135604230401&q=$city&aqi=yes"));
+      if(res.statusCode == 200){
+        var result = jsonDecode(res.body);
+        whether_data = result;
+        whether_current = whether_data["current"];
+        print(whether_data["current"]["temp_c"]);
+        setState(() {
+          isgetdata = false;
+        });
+      }
+      setState(() {
+          isgetdata = false;
+        });
+      
+    }
+  var whether = 32;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    get_city_whether();
   }
   @override
   Widget build(BuildContext context) {
@@ -60,6 +100,37 @@ class _drawer_homeState extends State<drawer_home> {
                             children: [
                               Text(greetingMessage() , style: TextStyle(fontSize: 20 , fontFamily: "SansFont"),),
                               Text("Navdip" , style: TextStyle(fontSize: 20 ,fontWeight: FontWeight.bold, fontFamily: "SansFont"),),
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          endIndent: 20,
+                          indent: 20,
+                          thickness: 3,
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            children: [
+                              
+                              Text("Currently In Surat " , style: TextStyle(fontFamily: "SansFont" , fontWeight: FontWeight.bold , fontSize: 15),),
+                              isgetdata ? Text("Loading...") :
+                              Row(
+                                
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    
+                                    height: 30,
+                                    width: 30,
+                                    child: Image.asset("asset/weather.png" , color: Colors.pinkAccent)),
+                                    SizedBox(width: 10,),
+                                  Text(
+                                    whether_data["current"]["temp_c"].toString() + "\u00B0", style: TextStyle(fontSize: 30 , color: Colors.pinkAccent),
+                                  ),
+                                ],
+                              )
+                              
                             ],
                           ),
                         ),
@@ -121,6 +192,16 @@ class _drawer_homeState extends State<drawer_home> {
                            
 
                           },
+                        ),
+                        ListTile(
+                          leading: Image.asset("asset/switch.png", scale: 20, color: Color.fromARGB(255, 218, 86, 3)),
+                          title: Text("Logout" , style: TextStyle(fontSize: 20 , color: Color.fromARGB(179, 233, 18, 3)),),
+                           onTap: () async {
+                             await _store.collection("users").doc(_auth.currentUser!.uid).update({"status": "Offline"});
+
+                             signout();
+                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => login()), (route) => false);
+                           }
                         )
                       ],
                     ),

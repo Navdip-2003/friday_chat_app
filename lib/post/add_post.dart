@@ -52,13 +52,28 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
         await compressed_images();
       }else{
         print("image is less than 2");
+        setState(() {
+          _final_image = File(_image!.path);
+        });
+        
       }
       await upload_image();
     }
   }
   
   Future crop_image() async{
-    CroppedFile? crop_img = await ImageCropper().cropImage(sourcePath: _image!.path);
+    CroppedFile? crop_img = await ImageCropper().cropImage(sourcePath: _image!.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'ImageCropper',
+            toolbarColor: Color.fromARGB(255, 10, 100, 0),
+            toolbarWidgetColor: Color.fromARGB(255, 255, 255, 255),
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+            activeControlsWidgetColor: Color.fromARGB(255, 10, 100, 0),
+          ),
+      ]
+    );
     if(crop_img !=  null){
       setState(() {
         _image = File(crop_img.path);
@@ -107,6 +122,9 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
       "post": image_url,
       "like_enable": true,
       "comment_enable": true,
+      "hight" : hight,
+      "width" : width
+      
     }).then((value) {
       print("post successfully done !!");
     });
@@ -118,17 +136,34 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
     });
     Navigator.pop(context);
   }
-
+  var hight;
+  var width;
   String image_url = "";
   Future upload_image() async {
-    isload = true;
-    var ref = FirebaseStorage.instance.ref().child("post_image").child(filename);
-    var up_image = await ref.putFile(_final_image!);
-    image_url = await up_image.ref.getDownloadURL();
-    print(image_url);
-    setState(() {
-      isload = false;
-    });
+    if(filename == null) {
+      isload = true;
+      return null;
+    }
+    if(filename != null){
+      isload = true;
+
+      var decode_image = await decodeImageFromList(_final_image!.readAsBytesSync());
+      setState(() {
+        hight = decode_image.height;
+        width = decode_image.width;
+      });
+
+      log("Image hight is : $hight and wight is : $width");
+
+      var ref = await FirebaseStorage.instance.ref().child("post_image").child(filename);
+      var up_image = await ref.putFile(_final_image!);
+      image_url = await up_image.ref.getDownloadURL();
+      print(image_url);
+      setState(() {
+        isload = false;
+      });
+    }
+    
   }
 
   late AnimationController cont;

@@ -60,7 +60,18 @@ class _edit_profileState extends State<edit_profile> with SingleTickerProviderSt
   }
   Future crop_image() async{
 
-    CroppedFile? crop_img = await ImageCropper().cropImage(sourcePath: pick_image!.path);
+    CroppedFile? crop_img = await ImageCropper().cropImage(sourcePath: pick_image!.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'ImageCropper',
+            toolbarColor: Color.fromARGB(255, 10, 100, 0),
+            toolbarWidgetColor: Color.fromARGB(255, 255, 255, 255),
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+            activeControlsWidgetColor: Color.fromARGB(255, 10, 100, 0),
+          ),
+      ]
+    );
     if(crop_img != null){
       setState(() {
       pick_image = File(crop_img.path);

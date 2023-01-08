@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:friday_chat_app/methods.dart';
 import 'package:friday_chat_app/open_image.dart';
 import 'package:friday_chat_app/post/add_post.dart';
 import 'package:friday_chat_app/post/comment_post.dart';
@@ -324,33 +325,42 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                             ],
                                                           ),
                                                         ),
-                                                        InkWell(
-                                                          onDoubleTap: () {
-                                                            if (jj == false) {
-                                                              setState(() {
-                                                                tot_like += 1;
-                                                                jj = true;
-                                                                _firestore.collection("post").doc(kl[index]["uid"]).collection("story").doc(kl[index]["post_id"]).update({'like.$cuu_id': true});
-                                                              });
-                                                            }
-                                                          },
-                                                          onTap: () {
-                                                            var url = snapshot.data!["post"];
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder: (context) => open_image(
-                                                                          url: url,
-                                                                        )));
-                                                          },
-                                                          child: Container(
-                                                            width: size.width,
-                                                            height: size.height / 2.2,
-                                                            child: CachedNetworkImage(
-                                                              fit: BoxFit.cover,
-                                                              imageUrl: snapshot.data!["post"],
-                                                              placeholder: (context, url) => Center(child: Lottie.asset("asset/image_loading.json", width: size.width / 7, height: size.height)),
-                                                              errorWidget: (context, url, error) => Icon(Icons.error),
+                                                        Divider(
+                                                          height: 0,
+                                                          indent: 5,
+                                                          thickness: 1,
+                                                          endIndent: 5,
+                                                        ),
+                                                        AspectRatio(
+                                                          aspectRatio: snapshot.data!["width"]/snapshot.data!["hight"],
+                                                          child: InkWell(
+                                                            onDoubleTap: () {
+                                                              if (jj == false) {
+                                                                setState(() {
+                                                                  tot_like += 1;
+                                                                  jj = true;
+                                                                  _firestore.collection("post").doc(kl[index]["uid"]).collection("story").doc(kl[index]["post_id"]).update({'like.$cuu_id': true});
+                                                                });
+                                                              }
+                                                            },
+                                                            onTap: () {
+                                                              var url = snapshot.data!["post"];
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) => open_image(
+                                                                            url: url,
+                                                                          )));
+                                                            },
+                                                            child: Container(
+                                                              // width: size.width,
+                                                              // height: size.height / 2.2,
+                                                              child: CachedNetworkImage(
+                                                                fit: BoxFit.cover,
+                                                                imageUrl: snapshot.data!["post"],
+                                                                placeholder: (context, url) => Center(child: Lottie.asset("asset/image_loading.json", width: size.width / 7, height: size.height)),
+                                                                errorWidget: (context, url, error) => Icon(Icons.error),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -425,14 +435,24 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                               SizedBox(
                                                                 width: size.width / 25,
                                                               ),
-                                                              InkWell(
-                                                                  onTap: () {
-                                                                    Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: kl[index]["post_id"])));
-                                                                  },
-                                                                  child: Image.asset(
-                                                                    "asset/comment.png",
-                                                                    scale: 23,
-                                                                  )),
+                                                              // InkWell(
+                                                              //     onTap: () {
+                                                              //       Navigator.push(context, MaterialPageRoute(builder: (context) => comment_post(post_id: kl[index]["post_id"])));
+                                                              //     },
+                                                              //     child: Image.asset(
+                                                              //       "asset/comment.png",
+                                                              //       scale: 23,
+                                                              //     )),
+                                                              Container(
+                                                                
+                                                                child: IconButton(
+                                                                  onPressed: (){
+                                                                    saved_image_galary(snapshot.data!["post"] , context);
+                                                              
+                                                                  }, 
+                                                                  icon: Icon(Icons.download , color: Color.fromARGB(255, 10, 66, 251),)
+                                                                ),
+                                                              ),
                                                               // IconButton(
                                                               //     onPressed: () async {
                                                               //       try {
@@ -450,47 +470,47 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                               //     },
                                                               //     icon: Icon(Icons.download)),
                                                               Padding(padding: EdgeInsets.all(8)),
-                                                              LikeButton(
-                                                                size: 30,
-                                                                //likeCount: 100,
-                                                                //countPostion: CountPostion.bottom,
-                                                                bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
-                                                                circleColor: CircleColor(start: Colors.black, end: Colors.white),
-                                                                likeBuilder: (isLiked) {
-                                                                  return Icon(
-                                                                    Icons.download,
-                                                                    color: Color.fromARGB(255, 2, 97, 249),
-                                                                    size: 25,
-                                                                  );
-                                                                },
-                                                                onTap: (isliked) async {
-                                                                  if (await Directory("/storage/emulated/0/FriDayChat").exists()) {
-                                                                    print("exist!!");
-                                                                    try {
-                                                                      var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"], 
-                                                                      //destination: AndroidDestinationType.custom(directory: 'sample')..subDirectory("FriDayChat/sample.jpg")
-                                                                      );
-                                                                      if (imageId == null) {
-                                                                        return !isliked;
-                                                                      }
-                                                                      var path = await ImageDownloader.findPath(imageId);
-                                                                      return !isliked;
-                                                                    } on PlatformException catch (error) {
-                                                                      print(error);
-                                                                    }
-                                                                    return !isliked;
-                                                                  } else {
-                                                                    await Directory("/storage/emulated/0/FriDayChat").create();
-                                                                    print("not exist");
-                                                                    return !isliked;
-                                                                  }
-                                                                },
-                                                              ),
+                                                              // LikeButton(
+                                                              //   size: 30,
+                                                              //   //likeCount: 100,
+                                                              //   //countPostion: CountPostion.bottom,
+                                                              //   bubblesColor: BubblesColor(dotPrimaryColor: Color.fromARGB(255, 2, 112, 203), dotSecondaryColor: Color.fromARGB(255, 255, 105, 137)),
+                                                              //   circleColor: CircleColor(start: Colors.black, end: Colors.white),
+                                                              //   likeBuilder: (isLiked) {
+                                                              //     return Icon(
+                                                              //       Icons.download,
+                                                              //       color: Color.fromARGB(255, 2, 97, 249),
+                                                              //       size: 25,
+                                                              //     );
+                                                              //   },
+                                                              //   onTap: (isliked) async {
+                                                              //     if (await Directory("/storage/emulated/0/FriDayChat").exists()) {
+                                                              //       print("exist!!");
+                                                              //       try {
+                                                              //         var imageId = await ImageDownloader.downloadImage(snapshot.data!["post"], 
+                                                              //         //destination: AndroidDestinationType.custom(directory: 'sample')..subDirectory("FriDayChat/sample.jpg")
+                                                              //         );
+                                                              //         if (imageId == null) {
+                                                              //           return !isliked;
+                                                              //         }
+                                                              //         var path = await ImageDownloader.findPath(imageId);
+                                                              //         return !isliked;
+                                                              //       } on PlatformException catch (error) {
+                                                              //         print(error);
+                                                              //       }
+                                                              //       return !isliked;
+                                                              //     } else {
+                                                              //       await Directory("/storage/emulated/0/FriDayChat").create();
+                                                              //       print("not exist");
+                                                              //       return !isliked;
+                                                              //     }
+                                                              //   },
+                                                              // ),
             
-                                                              Expanded(
-                                                                child: Container(),
-                                                              ),
-                                                              Icon(Icons.bookmark)
+                                                              // Expanded(
+                                                              //   child: Container(),
+                                                              // ),
+                                                              //Icon(Icons.bookmark)
                                                               // LikeButton(
                                                               //   size: 30,
                                                               //   //likeCount: 100,
