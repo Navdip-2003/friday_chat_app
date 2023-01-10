@@ -67,7 +67,15 @@ dependencies:
   audioplayers: ^1.2.0
 
   #auto size text
-  auto_size_text: ^3.0.0  
+  auto_size_text: ^3.0.0
+
+  #path prides for store files 
+  path_provider: ^2.0.11  
+  
+  dio: ^4.0.6
+  #show percentage for download
+  percent_indicator: ^4.2.2
+
   
 
 

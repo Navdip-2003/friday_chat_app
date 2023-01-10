@@ -151,7 +151,13 @@ class _chatroomState extends State<chatroom> {
   Future upload_pickimage() async {
     int status = 1;
     var filename = Uuid().v1();
-    await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).set({"sendy": _auth.currentUser!.displayName, "message": "", "type": "img", "time": DateTime.now()});
+    await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).set(
+      {
+        "sendy": _auth.currentUser!.displayName, 
+        "message": "", 
+        "type": "img", 
+        "time": DateTime.now()
+      });
     var ref = FirebaseStorage.instance.ref().child("images").child("$filename.jpg");
     var up_image = await ref.putFile(pick_image!).catchError((error) async {
       await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).delete();
@@ -593,6 +599,33 @@ class _chatroomState extends State<chatroom> {
                                                 : Center(
                                                     child: CircularProgressIndicator(),
                                                   ),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.symmetric(horizontal: 16),
+                                          alignment: snapshot.data!.docs[index]['sendy'] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+                                          //color: Colors.blueAccent,
+                                          width: rang.size.width,
+                                          child: Text(
+                                            dateString,
+                                            style: TextStyle(fontSize: 10, color: Colors.black45),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5)
+                                      ],
+                                    );
+                                  }else if (gt == "audio") {
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                          //height: rang.size.height / 4.4,
+                                          width: rang.size.width,
+                                          alignment: snapshot.data!.docs[index]["sendy"] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+                                          child: Container(
+                                            height: 100,
+                                            width: 400,
+                                            color: Colors.red,
                                           ),
                                         ),
                                         Container(

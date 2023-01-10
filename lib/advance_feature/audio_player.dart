@@ -11,6 +11,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
+import 'package:friday_chat_app/advance_feature/download_local_storage.dart';
 import 'package:friday_chat_app/advance_feature/player_audio.dart';
 import 'package:friday_chat_app/variables.dart';
 class audio_player extends StatefulWidget {
@@ -156,7 +157,7 @@ class _audio_playerState extends State<audio_player> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    var file = "/data/user/0/com.example.friday_chat_app/cache/file_picker/Mind_Relaxing_Mashup_|_Lo-fi_Cover_|_Romantic_Non-Stop_Jukebox_|_Bollywood_Songs_|_Relaxx_Vibes(128k)";
+                    var file = "/data/user/0/com.example.friday_chat_app/cache/file_picker/Gujarati_Slowed_+_Reverb_Mixtape_1_|_30_Minutes_to_Relax_and_Chill_|_Yours_Lo-fi_(_Gujarati_Lofi_)(128k).m4a";
                    if(await File(file).exists()){
                     log("file exists: " );
 
@@ -165,11 +166,17 @@ class _audio_playerState extends State<audio_player> {
 
                    }
                   
-                    _player.play(UrlSource("/data/user/0/com.example.friday_chat_app/cache/file_picker/Mind_Relaxing_Mashup_|_Lo-fi_Cover_|_Romantic_Non-Stop_Jukebox_|_Bollywood_Songs_|_Relaxx_Vibes(128k)"));
+                    _player.play(UrlSource(file));
                   
                   }, 
                   child: Text("PICK LOCAL AUDIO FILE")
                 ),
+                ElevatedButton(onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>download_storage()));
+
+                }, child: Text("GEt DowNload "))
+
+               
               ],
             ),
           ),
