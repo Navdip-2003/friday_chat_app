@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:friday_chat_app/advance_feature/player_audio.dart';
@@ -11,6 +13,7 @@ import 'package:friday_chat_app/popmenu_chatrom/chat_profile.dart';
 import 'package:friday_chat_app/variables.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -30,6 +33,10 @@ class _chatroomState extends State<chatroom> {
   String chat_id;
   Map<String, dynamic> usermap;
   _chatroomState(this.chat_id, this.usermap);
+  bool ex_file = false;
+
+
+  bool isDownloading = false;
 
   TextEditingController mess = new TextEditingController();
   ScrollController sc = new ScrollController();
@@ -37,6 +44,7 @@ class _chatroomState extends State<chatroom> {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool isloading = false;
+  var download_per = 0.0;
 
   bool block_user = false;
   void check() async {
@@ -213,6 +221,8 @@ class _chatroomState extends State<chatroom> {
     if (rang.viewInsets.bottom > 0) {
       scrolltobottom();
     }
+    
+    
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -479,6 +489,7 @@ class _chatroomState extends State<chatroom> {
                                 scrollDirection: Axis.vertical,
                                 itemCount: snapshot.data!.docs.length,
                                 itemBuilder: (context, index) {
+                                 
                                   String gt = snapshot.data!.docs[index]["type"];
                                   final Timestamp timestamp = snapshot.data!.docs[index]["time"] as Timestamp;
                                   final DateTime dateTime = timestamp.toDate();
@@ -582,67 +593,86 @@ class _chatroomState extends State<chatroom> {
                                       ],
                                     );
                                   } else if (gt == "img") {
-                                    return Column(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                          height: rang.size.height / 4.4,
-                                          width: rang.size.width,
-                                          alignment: snapshot.data!.docs[index]["sendy"] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
-                                          child: Container(
-                                            height: rang.size.height / 4.3,
-                                            width: rang.size.width / 2.6,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-
-                                                //snapshot.data!.docs[index]['message']
-                                                ),
-                                            child: snapshot.data!.docs[index]['message'] != ""
-                                                ? InkWell(
-                                                    onTap: () {
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context) => open_image(url: snapshot.data!.docs[index]['message'])));
-                                                    },
-                                                    child: Container(
-                                                        height: rang.size.height,
-                                                        width: rang.size.width,
-                                                        child: ClipRRect(
-                                                          borderRadius: BorderRadius.circular(20),
-                                                          child: Image.network(
-                                                            snapshot.data!.docs[index]['message'],
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        )),
-                                                  )
-                                                : Center(
-                                                    child: CircularProgressIndicator(),
+                                    return Slidable(
+                                      endActionPane: ActionPane(
+                                        extentRatio: 0.25,
+                                        motion: BehindMotion(),
+                                        children: [
+                                          SlidableAction(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.transparent,
+                                            autoClose: true,
+                                            onPressed: (context) async {
+                                              var delete_key = snapshot.data!.docs[index].id;
+                                              await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(delete_key).delete();
+                                            },
+                                            icon: Icons.delete,
+                                          )
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                            height: rang.size.height / 4.4,
+                                            width: rang.size.width,
+                                            alignment: snapshot.data!.docs[index]["sendy"] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+                                            child: Container(
+                                              height: rang.size.height / 4.3,
+                                              width: rang.size.width / 2.6,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                    
+                                                  //snapshot.data!.docs[index]['message']
                                                   ),
+                                              child: snapshot.data!.docs[index]['message'] != ""
+                                                  ? InkWell(
+                                                      onTap: () {
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => open_image(url: snapshot.data!.docs[index]['message'])));
+                                                      },
+                                                      child: Container(
+                                                          height: rang.size.height,
+                                                          width: rang.size.width,
+                                                          child: ClipRRect(
+                                                            borderRadius: BorderRadius.circular(20),
+                                                            child: Image.network(
+                                                              snapshot.data!.docs[index]['message'],
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          )),
+                                                    )
+                                                  : Center(
+                                                      child: CircularProgressIndicator(),
+                                                    ),
+                                            ),
                                           ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.symmetric(horizontal: 16),
-                                          alignment: snapshot.data!.docs[index]['sendy'] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
-                                          //color: Colors.blueAccent,
-                                          width: rang.size.width,
-                                          child: Text(
-                                            dateString,
-                                            style: TextStyle(fontSize: 10, color: Colors.black45),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(horizontal: 16),
+                                            alignment: snapshot.data!.docs[index]['sendy'] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+                                            //color: Colors.blueAccent,
+                                            width: rang.size.width,
+                                            child: Text(
+                                              dateString,
+                                              style: TextStyle(fontSize: 10, color: Colors.black45),
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(height: 5)
-                                      ],
+                                          SizedBox(height: 5)
+                                        ],
+                                      ),
                                     );
                                   } else if (gt == "audio") {
                                     return Column(
+                                      mainAxisSize: MainAxisSize.min,
                                      
                                       children: [
                                         Container(
                                           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                                           //height: rang.size.height / 4.4,
-                                          width: rang.size.width,
+                                          //width: rang.size.width,
                                           alignment: snapshot.data!.docs[index]["sendy"] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
                                           child: Container(
                                            // height: 100,
-                                            width: rang.size.width / 2,
+                                           // width: rang.size.width / 1.7,
                                             decoration: BoxDecoration(
                                               color: Colors.grey.shade500,
                                               borderRadius: BorderRadius.only(
@@ -653,17 +683,18 @@ class _chatroomState extends State<chatroom> {
                                               )
                                             ),
                                             child: Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Flexible(
                                                   flex: 2,
                                                   child: Container(
                                                     padding: EdgeInsets.only(left: 10, top: 5 , bottom: 5),
                                                     child: InkWell(
-                                                      onTap: () {
-                                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                                                          player_audio(link: snapshot.data!.docs[index]['message'], )
-                                                        ));
-                                                        
+                                                      onTap: () async {
+                                                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                                                        //   player_audio(link: snapshot.data!.docs[index]['message'], )
+                                                        // ));
+                                                        await file_exists(snapshot.data!.docs[index]['name'] , snapshot.data!.docs[index]['message'] );
                                                       },
                                                       child: CircleAvatar(
                                                         maxRadius: 30,
@@ -690,7 +721,7 @@ class _chatroomState extends State<chatroom> {
                                                   child: Container(
                                                     padding: EdgeInsets.all(10),
                                                     child: Container(
-                                                      child: AutoSizeText(snapshot.data!.docs[index]['message'] , 
+                                                      child: AutoSizeText(snapshot.data!.docs[index]['name'] , 
                                                       overflow: TextOverflow.ellipsis,maxLines: 2, 
                                                         style: TextStyle(
                                                           color: Colors.grey.shade200
@@ -698,7 +729,40 @@ class _chatroomState extends State<chatroom> {
                                                       ),
                                                     ),
                                                   ),
-                                                )
+                                                ),
+
+                                                ex_file ? Container(
+                                                  padding: EdgeInsets.all(5),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      
+                                                    },
+                                                    child: Column(
+                                                      children: [
+                                                        CircularPercentIndicator(
+                                                          
+                                                          radius: 15,
+                                                          animateFromLastPercent: true,
+                                                          animation: true,
+                                                          lineWidth: 5,
+                                                          percent: (download_per / 100 ),
+                                                          progressColor: Colors.blueGrey,
+                                                          backgroundColor: Colors.blueGrey.shade100,
+                                                          circularStrokeCap: CircularStrokeCap.round,
+                                                          center: isDownloading ? 
+                                                  
+                                                            Icon(Icons.close , color: Colors.white,) : 
+                                                            Icon(Icons.downloading_rounded , color: Colors.white,)
+                                                          
+                                                        ),
+                                                        AutoSizeText("${download_per.toStringAsFixed(0)} %",style: TextStyle(color: Colors.white),
+                                                          minFontSize: 5,
+                                                          maxFontSize: 10,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ) : SizedBox()
 
                                               ],
                                             ),
@@ -734,6 +798,47 @@ class _chatroomState extends State<chatroom> {
         ],
       ),
     );
+  }
+  Future<bool> file_exists(doc, url) async{
+   
+    if(await File(local_directory_path +"/"+doc).exists()){
+      log("file exists ");
+      setState(() {
+        ex_file = false;
+      });
+      if(doc == null){
+        return  false;
+      }
+       Navigator.push(context, MaterialPageRoute(builder: (context)=>
+          player_audio(link: url, )
+          ));
+      return true;
+
+    }else{
+      log("file not exists!! ");
+      setState(() {
+        ex_file = true;
+      });
+      File file_name = File(local_directory_path + "/" + doc );
+      await Dio().download(
+         url, 
+         file_name.path,
+         onReceiveProgress: (count, total) {
+           setState(() {
+              download_per = count / total * 100;
+              
+           });
+         },
+         
+      ).then((value) {
+        setState(() {
+          ex_file = false;
+        });
+      });
+
+      return false;
+    }
+
   }
   Widget show_modelsheet(MediaQueryData rang){
     return Container(
