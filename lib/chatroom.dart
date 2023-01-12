@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:friday_chat_app/advance_feature/player_audio.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/navigation.dart';
 import 'package:friday_chat_app/open_image.dart';
@@ -136,9 +138,9 @@ class _chatroomState extends State<chatroom> {
 
   ImagePicker _picker = ImagePicker();
   File? pick_image;
-  Future image_picker() async {
+  Future image_picker(ImageSource source) async {
     //String ft_image;
-    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    XFile? image = await _picker.pickImage(source: source);
     if (image != null) {
       setState(() {
         pick_image = File(image.path);
@@ -264,12 +266,27 @@ class _chatroomState extends State<chatroom> {
                             filled: true,
                             isCollapsed: true,
                             contentPadding: EdgeInsets.all(rang.size.height / 60),
-                            suffixIcon: IconButton(
-                              icon: Icon(Icons.camera_alt_rounded, size: rang.size.height / 30, color: Color.fromARGB(255, 88, 87, 87)),
-                              onPressed: () {
-                                image_picker();
-                              },
-                            ),
+                            suffixIcon: 
+                                IconButton(
+                                  onPressed:() {
+                                    showModalBottomSheet(
+                                      context: context, 
+                                      builder: (context) {
+                                        return show_modelsheet(rang);
+                                        
+                                      },
+                                    );
+                                  
+                                  }, 
+                                  icon: Icon(Icons.attach_file, color: Color.fromARGB(255, 88, 87, 87))
+                                ),
+                                // IconButton(
+                                //   icon: Icon(Icons.camera_alt_rounded, size: rang.size.height / 30, color: Color.fromARGB(255, 88, 87, 87)),
+                                //   onPressed: () {
+                                //     image_picker();
+                                //   },
+                                // ),
+                              
                             hintText: "Message",
                             focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -614,8 +631,9 @@ class _chatroomState extends State<chatroom> {
                                         SizedBox(height: 5)
                                       ],
                                     );
-                                  }else if (gt == "audio") {
+                                  } else if (gt == "audio") {
                                     return Column(
+                                     
                                       children: [
                                         Container(
                                           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
@@ -623,9 +641,67 @@ class _chatroomState extends State<chatroom> {
                                           width: rang.size.width,
                                           alignment: snapshot.data!.docs[index]["sendy"] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
                                           child: Container(
-                                            height: 100,
-                                            width: 400,
-                                            color: Colors.red,
+                                           // height: 100,
+                                            width: rang.size.width / 2,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade500,
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20) ,
+                                                topRight: Radius.circular(5) ,
+                                                bottomLeft: Radius.circular(30) , 
+                                                bottomRight: Radius.circular(30)
+                                              )
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Flexible(
+                                                  flex: 2,
+                                                  child: Container(
+                                                    padding: EdgeInsets.only(left: 10, top: 5 , bottom: 5),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                                                          player_audio(link: snapshot.data!.docs[index]['message'], )
+                                                        ));
+                                                        
+                                                      },
+                                                      child: CircleAvatar(
+                                                        maxRadius: 30,
+                                                        minRadius: 21,
+                                                        backgroundColor: Colors.redAccent,
+                                                        child: Column(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Image.asset("asset/headphones.png" , scale: 20, color: Colors.white,),
+                                                            Container(
+                                                              padding: EdgeInsets.all(4),
+                                                              child: AutoSizeText(snapshot.data!.docs[index]['duration'] , maxFontSize: 13, minFontSize: 8,
+                                                                style: TextStyle(color: Colors.white),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  flex: 2,
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(10),
+                                                    child: Container(
+                                                      child: AutoSizeText(snapshot.data!.docs[index]['message'] , 
+                                                      overflow: TextOverflow.ellipsis,maxLines: 2, 
+                                                        style: TextStyle(
+                                                          color: Colors.grey.shade200
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         Container(
@@ -658,5 +734,179 @@ class _chatroomState extends State<chatroom> {
         ],
       ),
     );
+  }
+  Widget show_modelsheet(MediaQueryData rang){
+    return Container(
+      height: rang.size.height / 3,
+      width: rang.size.width,
+     
+      //color: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 72, 72, 72),
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              
+              Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Color.fromARGB(255, 152, 58, 0),
+                              child: Image.asset("asset/headphones.png" , scale: 15, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                        AutoSizeText("Audio", style: TextStyle(
+                          color: Colors.white60
+                        ),)
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              image_picker(ImageSource.camera);
+                              Navigator.pop(context);
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Color.fromARGB(255, 0, 106, 152),
+                              child: Icon(Icons.camera_alt_outlined, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                        AutoSizeText("Camera", style: TextStyle(
+                          color: Colors.white60
+                        ),)
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              image_picker(ImageSource.gallery);
+                              Navigator.pop(context);
+                              
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Color.fromARGB(255, 179, 1, 149),
+                              child: Icon(Icons.photo, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                        AutoSizeText("Gallery", style: TextStyle(
+                          color: Colors.white60
+                        ),)
+                      ],
+                    )
+
+                  ],
+                ),
+              ),
+             // Padding(padding: EdgeInsets.all(10)),
+              Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Color.fromARGB(255, 14, 108, 0),
+                              child: Icon(Icons.front_hand_rounded, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                        AutoSizeText("Document", style: TextStyle(
+                          color: Colors.white60
+                        ),)
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Color.fromARGB(255, 255, 40, 40),
+                              child: Icon(Icons.person, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                        AutoSizeText("Contact", style: TextStyle(
+                          color: Colors.white60
+                        ),)
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Color.fromARGB(255, 152, 58, 0),
+                              child: Image.asset("asset/headphones.png" , scale: 15, color: Colors.white,),
+                            ),
+                          ),
+                        ),
+                        AutoSizeText("Audio", style: TextStyle(
+                          color: Colors.white60
+                        ),)
+                      ],
+                    )
+
+                  ],
+                ),
+              ),
+            
+            
+            ],
+          ),
+          
+          
+          
+        ),
+      )
+      
+
+    );
+
   }
 }

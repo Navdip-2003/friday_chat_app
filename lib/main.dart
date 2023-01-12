@@ -58,8 +58,13 @@ Future main() async {
       title: "FriDay_Chat",
       home:
           //VideoWidget()
-          splash()
+          splash(),
       // use == null ? login() : navigation()
+      theme: ThemeData(
+        bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: Colors.black.withOpacity(0)
+        )
+      ),
 
       ));
 }
