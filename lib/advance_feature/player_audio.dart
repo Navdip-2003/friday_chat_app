@@ -28,6 +28,7 @@ class _player_audioState extends State<player_audio> with SingleTickerProviderSt
   void initState() {
     // TODO: implement initState
     super.initState();
+    log(widget.link);
     _controller = AnimationController(
       duration: Duration(milliseconds: 0),
       vsync: this);
@@ -107,7 +108,7 @@ class _player_audioState extends State<player_audio> with SingleTickerProviderSt
                         child: Lottie.asset("asset/music_player.json", width: size.width / 1 , height: size.height / 2.5)),
                       Container(
                         padding: EdgeInsets.all(20),
-                        child: AutoSizeText(widget.link , 
+                        child: AutoSizeText(widget.link.split("/").last , 
                         
                           maxLines: 2, minFontSize: 15, maxFontSize: 30,overflow: TextOverflow.ellipsis, style: TextStyle(
                           fontFamily: "SansFont",  color: Colors.white),
@@ -156,12 +157,17 @@ class _player_audioState extends State<player_audio> with SingleTickerProviderSt
                         alignment: Alignment.center,
                         child: InkWell(
                           onTap: () async{
-                            if(is_play){
-                               _controller.stop();
-                              //_controller.forward();
-                               await _player.pause();
-                            }else{
-                              await _player.play(UrlSource(widget.link));
+                            try{
+                              if(is_play){
+                                _controller.stop();
+                                //_controller.forward();
+                                await _player.pause();
+                              }else{
+                                await _player.play(UrlSource(widget.link));
+                              }
+                            }catch(e){
+                              print(e);
+
                             }
                           },
                           child: Icon(is_play ? Icons.pause : Icons.play_circle , size: 50, color: Colors.white,)

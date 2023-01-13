@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:friday_chat_app/Group_chat/group_profile.dart';
 
 FirebaseAuth _auth = FirebaseAuth.instance;
 FirebaseFirestore _store = FirebaseFirestore.instance;  
@@ -67,6 +69,27 @@ Future<bool> onbackbutton(BuildContext context) async{
 show_snak (BuildContext context, det){
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(content: Text(det))
+  );
+}
+show_ALERT_dialog(BuildContext context){
+  showDialog(
+    context: context, 
+    builder: (context) {
+      return AlertDialog(
+
+      );
+      
+    },
+  );
+}
+
+
+show_tost(String msg){
+  Fluttertoast.showToast(
+    msg: msg,
+    toastLength: Toast.LENGTH_SHORT,
+    gravity: ToastGravity.BOTTOM,
+    backgroundColor: Colors.grey,
   );
 }
 

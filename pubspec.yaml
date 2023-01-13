@@ -76,6 +76,8 @@ dependencies:
   #show percentage for download
   percent_indicator: ^4.2.2
 
+  fluttertoast: ^8.1.2
+
   
 
 

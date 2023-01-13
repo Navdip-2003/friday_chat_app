@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:friday_chat_app/advance_feature/player_audio.dart';
@@ -19,6 +20,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class chatroom extends StatefulWidget {
   String chat_id;
@@ -34,7 +37,7 @@ class _chatroomState extends State<chatroom> {
   Map<String, dynamic> usermap;
   _chatroomState(this.chat_id, this.usermap);
   bool ex_file = false;
-
+  
 
   bool isDownloading = false;
 
@@ -217,6 +220,7 @@ class _chatroomState extends State<chatroom> {
   @override
   Widget build(BuildContext context) {
     var rang = MediaQuery.of(context);
+    
 
     if (rang.viewInsets.bottom > 0) {
       scrolltobottom();
@@ -662,6 +666,7 @@ class _chatroomState extends State<chatroom> {
                                     );
                                   } else if (gt == "audio") {
                                     return Column(
+                                      key: PageStorageKey<String>(snapshot.data!.docs[index]["time"]) ,
                                       mainAxisSize: MainAxisSize.min,
                                      
                                       children: [
@@ -694,7 +699,11 @@ class _chatroomState extends State<chatroom> {
                                                         // Navigator.push(context, MaterialPageRoute(builder: (context)=>
                                                         //   player_audio(link: snapshot.data!.docs[index]['message'], )
                                                         // ));
-                                                        await file_exists(snapshot.data!.docs[index]['name'] , snapshot.data!.docs[index]['message'] );
+                                                        if (!ex_file){
+                                                          if(snapshot.data!.docs[index]['message'] != ""){
+                                                            await file_exists(snapshot.data!.docs[index]['name'] , snapshot.data!.docs[index]['message'] );
+                                                          }
+                                                        }
                                                       },
                                                       child: CircleAvatar(
                                                         maxRadius: 30,
@@ -720,17 +729,31 @@ class _chatroomState extends State<chatroom> {
                                                   flex: 2,
                                                   child: Container(
                                                     padding: EdgeInsets.all(10),
-                                                    child: Container(
-                                                      child: AutoSizeText(snapshot.data!.docs[index]['name'] , 
-                                                      overflow: TextOverflow.ellipsis,maxLines: 2, 
-                                                        style: TextStyle(
-                                                          color: Colors.grey.shade200
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          child: AutoSizeText(snapshot.data!.docs[index]['name'] , 
+                                                          overflow: TextOverflow.ellipsis,maxLines: 2, 
+                                                            style: TextStyle(
+                                                              color: Colors.grey.shade200
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
+                                                        snapshot.data!.docs[index]['message'] == "" ? Container(
+                                                          child: AutoSizeText("Sending..." , 
+                                                          maxFontSize: 8,
+                                                          minFontSize: 5,
+                                                          overflow: TextOverflow.ellipsis,maxLines: 1, 
+                                                            style: TextStyle(
+                                                              color: Colors.grey.shade200
+                                                            ),
+                                                          ),
+                                                        ) : SizedBox(),
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
-
+                                               
                                                 ex_file ? Container(
                                                   padding: EdgeInsets.all(5),
                                                   child: InkWell(
@@ -738,9 +761,9 @@ class _chatroomState extends State<chatroom> {
                                                       
                                                     },
                                                     child: Column(
+                                                      
                                                       children: [
                                                         CircularPercentIndicator(
-                                                          
                                                           radius: 15,
                                                           animateFromLastPercent: true,
                                                           animation: true,
@@ -799,6 +822,74 @@ class _chatroomState extends State<chatroom> {
       ),
     );
   }
+ 
+  File? audio_file;
+  Future AUD_FILE_PICK() async {
+    
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      allowCompression: true,
+      allowedExtensions: ["mp3"],
+      type: FileType.custom
+    );
+    if(result != null){
+      var size;
+
+      setState(() {
+        final path = result.files.first.path;
+        audio_file = File(path!);
+        int sizeinBYTE = audio_file!.lengthSync();
+        size =  audio_file!.readAsBytesSync().length / (1024*1000);
+        });
+        if(size > 20){
+          log("FILE IS BIG SIZE !!");
+          show_tost("Can't send Audio messages over 20 MB");
+          // show_snak(context, 
+          // "Can't send Audio messages over 16 MB");
+        }else{
+          upload_audio_file();
+
+        } 
+    }
+
+  }
+  bool upload_audio = false;
+  Future upload_audio_file() async {
+    if(audio_file == null){
+      return null;
+    }
+    // setState(() {
+    //   upload_audio = true;
+    // });
+    int status = 1;
+    var filename = "AUD-"+Uuid().v1();
+    log(filename);
+    await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).set(
+      {
+        "sendy": _auth.currentUser!.displayName, 
+        "message": "", 
+        "name" : filename+".mp3",
+        "duration" : "02:05",
+        "type": "audio", 
+        "time": DateTime.now()
+      });
+    var ref = FirebaseStorage.instance.ref().child("audio_file").child("$filename.jpg");
+    var up_image = await ref.putFile(audio_file!).catchError((error) async {
+      await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).delete();
+      status = 0;
+    });
+    if (status == 1) {
+      String audio_url = await up_image.ref.getDownloadURL();
+      await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).update({"message": audio_url});
+      print(audio_url);
+    }
+    // setState(() {
+    //   upload_audio = false;
+    // });
+  }
+  
+
+
   Future<bool> file_exists(doc, url) async{
    
     if(await File(local_directory_path +"/"+doc).exists()){
@@ -809,12 +900,14 @@ class _chatroomState extends State<chatroom> {
       if(doc == null){
         return  false;
       }
+      var link = local_directory_path +"/"+doc;
        Navigator.push(context, MaterialPageRoute(builder: (context)=>
-          player_audio(link: url, )
+          player_audio(link: link, )
           ));
       return true;
 
     }else{
+      
       log("file not exists!! ");
       setState(() {
         ex_file = true;
@@ -869,6 +962,8 @@ class _chatroomState extends State<chatroom> {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
+                              AUD_FILE_PICK();
+                              Navigator.pop(context);
                               
                             },
                             child: CircleAvatar(
