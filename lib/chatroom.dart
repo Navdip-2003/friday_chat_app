@@ -420,6 +420,16 @@ class _chatroomState extends State<chatroom> {
                                     } else if (value == "clear") {
                                       delete_message();
                                     } else if (value == "Blok") {
+                                       _firestore.collection("chatroom").doc(widget.chat_id).get().then((value) {
+                                        print(value.data());
+                                        var user_data = value.data();
+                                        print(user_data!["block"]);
+                                       });
+                                      // _firestore.collection("chatroom").doc(widget.chat_id).set({
+                                      //   "block" : false
+
+                                      // });
+                                      
                                       //blok_message();
                                     }
                                   }),
@@ -666,7 +676,7 @@ class _chatroomState extends State<chatroom> {
                                     );
                                   } else if (gt == "audio") {
                                     return Column(
-                                      key: PageStorageKey<String>(snapshot.data!.docs[index]["time"]) ,
+                                      key: PageStorageKey<String>(snapshot.data!.docs[index]["id"]) ,
                                       mainAxisSize: MainAxisSize.min,
                                      
                                       children: [
@@ -706,6 +716,7 @@ class _chatroomState extends State<chatroom> {
                                                         }
                                                       },
                                                       child: CircleAvatar(
+                                                        key: PageStorageKey<String>(snapshot.data!.docs[index]["id"]),
                                                         maxRadius: 30,
                                                         minRadius: 21,
                                                         backgroundColor: Colors.redAccent,
@@ -739,6 +750,20 @@ class _chatroomState extends State<chatroom> {
                                                             ),
                                                           ),
                                                         ),
+                                                        Container(
+                                                          alignment: Alignment.bottomRight,
+                                                          child: AutoSizeText(snapshot.data!.docs[index]['size'] , 
+                                                          maxFontSize: 10,
+                                                          minFontSize: 4,
+                                                          overflow: TextOverflow.ellipsis,maxLines: 1, 
+                                                            style: TextStyle(
+                                                              fontWeight: FontWeight.w300,
+                                                              color: Colors.grey.shade200
+                                                              
+                                                            ),
+                                                          ),
+                                                        ),
+
                                                         snapshot.data!.docs[index]['message'] == "" ? Container(
                                                           child: AutoSizeText("Sending..." , 
                                                           maxFontSize: 8,
@@ -830,7 +855,9 @@ class _chatroomState extends State<chatroom> {
       allowMultiple: false,
       allowCompression: true,
       allowedExtensions: ["mp3"],
-      type: FileType.custom
+      type: FileType.custom,
+      dialogTitle: "Pick Audio Files",
+
     );
     if(result != null){
       var size;
@@ -842,7 +869,6 @@ class _chatroomState extends State<chatroom> {
         size =  audio_file!.readAsBytesSync().length / (1024*1000);
         });
         if(size > 20){
-          log("FILE IS BIG SIZE !!");
           show_tost("Can't send Audio messages over 20 MB");
           // show_snak(context, 
           // "Can't send Audio messages over 16 MB");
@@ -864,14 +890,19 @@ class _chatroomState extends State<chatroom> {
     int status = 1;
     var filename = "AUD-"+Uuid().v1();
     log(filename);
+    var file_size = audio_file!.lengthSync() / (1024*1024);
+    var size_custom = file_size.toStringAsFixed(2);
+    
     await _firestore.collection("chatroom").doc(chat_id).collection("chat").doc(filename).set(
       {
+        "id": filename, 
         "sendy": _auth.currentUser!.displayName, 
         "message": "", 
         "name" : filename+".mp3",
         "duration" : "02:05",
         "type": "audio", 
-        "time": DateTime.now()
+        "time": DateTime.now(),
+        "size" : "$size_custom MB"
       });
     var ref = FirebaseStorage.instance.ref().child("audio_file").child("$filename.jpg");
     var up_image = await ref.putFile(audio_file!).catchError((error) async {
@@ -892,7 +923,7 @@ class _chatroomState extends State<chatroom> {
 
   Future<bool> file_exists(doc, url) async{
    
-    if(await File(local_directory_path +"/"+doc).exists()){
+    if(await File(local_directory_path  +"/"+doc).exists()){
       log("file exists ");
       setState(() {
         ex_file = false;
@@ -923,11 +954,14 @@ class _chatroomState extends State<chatroom> {
            });
          },
          
-      ).then((value) {
+      ).catchError((error){
+        Dio().delete(file_name.path);
+      }).then((value) {
         setState(() {
           ex_file = false;
         });
       });
+      
 
       return false;
     }

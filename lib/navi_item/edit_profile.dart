@@ -287,6 +287,7 @@ class _edit_profileState extends State<edit_profile> with SingleTickerProviderSt
                               builder: (Builder){
                                 return Container(
                                   decoration: BoxDecoration(
+                                    color: Color.fromARGB(255, 250, 250, 250),
                                     borderRadius: BorderRadius.circular(20),
                                     
                                   ),

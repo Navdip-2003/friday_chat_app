@@ -86,6 +86,8 @@ class con_search extends SearchDelegate<String>{
                             usermap = value.data();
                           });
                           String ci = get_chatid(FirebaseAuth.instance.currentUser!.uid, data["uid"]);
+                         
+
 
 
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>chatroom(chat_id: ci, usermap: usermap)));

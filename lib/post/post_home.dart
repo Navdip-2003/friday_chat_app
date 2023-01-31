@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:friday_chat_app/methods.dart';
 import 'package:friday_chat_app/open_image.dart';
 import 'package:friday_chat_app/post/add_post.dart';
@@ -18,7 +20,9 @@ import 'package:lottie/lottie.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
 
 class post_home extends StatefulWidget {
   const post_home({super.key});
@@ -280,13 +284,22 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                           padding: EdgeInsets.all(5),
                                                           child: Row(
                                                             children: [
-                                                              CircleAvatar(
-                                                                radius: 26,
-                                                                foregroundColor: Color.fromARGB(255, 244, 119, 2),
-                                                                child: CircleAvatar(
-                                                                  radius: 24,
-                                                                  backgroundImage: NetworkImage(snap.data!["image"]),
-                                                                ),
+                                                              // CircleAvatar(
+                                                              //   radius: 26,
+                                                              //   foregroundColor: Color.fromARGB(255, 244, 119, 2),
+                                                              //   child: CircleAvatar(
+                                                              //     radius: 24,
+                                                              //     backgroundImage: NetworkImage(snap.data!["image"]),
+                                                              //   ),
+                                                              // ),
+                                                             
+                                                              CachedNetworkImage(fit: BoxFit.cover, imageUrl: snap.data!["image"],
+                                                                imageBuilder: (context, imageProvider) {
+                                                                  return CircleAvatar(
+                                                                    radius: 26,
+                                                                    backgroundImage: imageProvider,
+                                                                  );
+                                                                },
                                                               ),
                                                               Expanded(
                                                                 child: Container(
@@ -408,6 +421,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                                   }
                                                                 },
                                                               ),
+                                                              if (!like_enable) Text("Likes" , style: TextStyle(color: Colors.grey),) ,
             
                                                               // IconButton(
                                                               //   onPressed: () async{
@@ -433,7 +447,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
             
                                                               // ),
                                                               SizedBox(
-                                                                width: size.width / 25,
+                                                                width: size.width / 80,
                                                               ),
                                                               // InkWell(
                                                               //     onTap: () {
@@ -446,8 +460,21 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                               Container(
                                                                 
                                                                 child: IconButton(
-                                                                  onPressed: (){
-                                                                    saved_image_galary(snapshot.data!["post"] , context);
+                                                                  onPressed: () async{
+                                                                    showDialog(context: context, builder: (context) {
+                                                                      return Center(child: CircularProgressIndicator(),);
+                                                                    }, );
+                                                                   // saved_image_galary(snapshot.data!["post"] , context);
+                                                                    var name = Uuid().v1();
+                                                                    var dd = "photo-$name";
+                                                                   
+
+                                                                    File path = File(local_directory_path + "/" + "$dd.jpg" );
+                                                                    await Dio().download(snapshot.data!["post"], path.path ).whenComplete(() {
+                                                                      Navigator.pop(context);
+                                                                      show_snak(context, "Download image done !!!!");
+
+                                                                    });
                                                               
                                                                   }, 
                                                                   icon: Icon(Icons.download , color: Color.fromARGB(255, 10, 66, 251),)
@@ -564,7 +591,7 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                         //               ),
                                                         //       ),
                                                         snapshot.data!["description"] != "" ? Container(
-                                                          padding: EdgeInsets.all(10),
+                                                          padding: EdgeInsets.only(right: 10 , left: 10 , bottom: 5 , top: 0),
                                                           width: size.width,
                                                           child: Text(
                                                             snapshot.data!["description"],
@@ -582,10 +609,13 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                             },
                                                             child: Row(
                                                               children: [
-                                                                CircleAvatar(
-                                                                  radius: 15,
-                                                                  backgroundImage: imgLoad ? null : NetworkImage(image!),
+                                                                CachedNetworkImage(
+                                                                  imageUrl: image!
                                                                 ),
+                                                                // CircleAvatar(
+                                                                //   radius: 15,
+                                                                //   backgroundImage: imgLoad ? null : NetworkImage(image!),
+                                                                // ),
                                                                 Padding(padding: EdgeInsets.only(right: 10)),
                                                                 Text("Add a comments...", style: TextStyle(color: Colors.black45),)
                                                               ],

@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -26,6 +30,7 @@ import 'package:friday_chat_app/try1.dart';
 import 'package:friday_chat_app/variables.dart';
 import 'package:friday_chat_app/vedio_play.dart';
 import 'package:friday_chat_app/video.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class navigation extends StatefulWidget {
   int? i;
@@ -38,6 +43,9 @@ class navigation extends StatefulWidget {
 class _navigationState extends State<navigation> with WidgetsBindingObserver {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore _store = FirebaseFirestore.instance;
+  late StreamSubscription subscription;
+  var isdeviceconnected = false;
+  bool isalertset = false;
 
   var bottom_key = GlobalKey<State<BottomNavigationBar>>();
 
@@ -75,6 +83,7 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
     // TODO: implement initState
     super.initState();
     var use = FirebaseAuth.instance.currentUser;
+    getconnectivity();
     if (use != null) {
       suser();
       //print("current user is  : "+ ddata!["email"]);
@@ -87,6 +96,20 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
   }
+  void getconnectivity(){
+    subscription = Connectivity().onConnectivityChanged.listen((event) async {
+      isdeviceconnected = await InternetConnectionChecker().hasConnection;
+      if(!isdeviceconnected && isalertset == false){
+        showdialogbox();
+        setState(() {
+          isalertset = true;
+        });
+      }
+      
+    });
+  }
+
+  
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -110,7 +133,10 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
         unselectedItemColor: Colors.grey.withOpacity(0.5),
         type: BottomNavigationBarType.fixed,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home"
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
             label: 'Search ',
@@ -133,4 +159,33 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
       ),
     );
   }
+  showdialogbox() =>
+  showCupertinoDialog<String>(
+    context: context, 
+    builder: (BuildContext context) => CupertinoAlertDialog(
+      title: Text("No Connection"),
+      content: Text("please check your internet connectivity "),
+      actions: [
+        TextButton(
+          onPressed: ()async{
+            Navigator.pop(context,'cancel');
+            setState(() {
+              isalertset = false;
+            });
+            isdeviceconnected = await InternetConnectionChecker().hasConnection;
+            if(!isdeviceconnected){
+              showdialogbox();
+              setState(() {
+                isalertset = true;
+              });
+            }
+            
+
+          }, 
+          child: Text("OK")
+        )
+      ],
+    )
+    
+  );
 }
