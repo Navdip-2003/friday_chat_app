@@ -716,7 +716,6 @@ class _chatroomState extends State<chatroom> {
                                                         }
                                                       },
                                                       child: CircleAvatar(
-                                                        key: PageStorageKey<String>(snapshot.data!.docs[index]["id"]),
                                                         maxRadius: 30,
                                                         minRadius: 21,
                                                         backgroundColor: Colors.redAccent,
@@ -961,7 +960,7 @@ class _chatroomState extends State<chatroom> {
           ex_file = false;
         });
       });
-      
+  
 
       return false;
     }

@@ -67,7 +67,7 @@ class _drawer_homeState extends State<drawer_home> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    get_city_whether();
+   // get_city_whether();
   }
   @override
   Widget build(BuildContext context) {
@@ -108,32 +108,32 @@ class _drawer_homeState extends State<drawer_home> {
                           indent: 20,
                           thickness: 3,
                         ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                            children: [
+                        // Align(
+                        //   alignment: Alignment.center,
+                        //   child: Column(
+                        //     children: [
                               
-                              Text("Currently In Surat " , style: TextStyle(fontFamily: "SansFont" , fontWeight: FontWeight.bold , fontSize: 15),),
-                              isgetdata ? Text("Loading...") :
-                              Row(
+                        //       Text("Currently In Surat " , style: TextStyle(fontFamily: "SansFont" , fontWeight: FontWeight.bold , fontSize: 15),),
+                        //       isgetdata ? Text("Loading...") :
+                        //       Row(
                                 
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
+                        //         mainAxisAlignment: MainAxisAlignment.center,
+                        //         children: [
+                        //           Container(
                                     
-                                    height: 30,
-                                    width: 30,
-                                    child: Image.asset("asset/weather.png" , color: Colors.pinkAccent)),
-                                    SizedBox(width: 10,),
-                                  Text(
-                                    whether_data["current"]["temp_c"].toString() + "\u00B0", style: TextStyle(fontSize: 30 , color: Colors.pinkAccent),
-                                  ),
-                                ],
-                              )
+                        //             height: 30,
+                        //             width: 30,
+                        //             child: Image.asset("asset/weather.png" , color: Colors.pinkAccent)),
+                        //             SizedBox(width: 10,),
+                        //           Text(
+                        //             whether_data["current"]["temp_c"].toString() + "\u00B0", style: TextStyle(fontSize: 30 , color: Colors.pinkAccent),
+                        //           ),
+                        //         ],
+                        //       )
                               
-                            ],
-                          ),
-                        ),
+                        //     ],
+                        //   ),
+                        // ),
                         Divider(
                           endIndent: 20,
                           indent: 20,
@@ -202,6 +202,17 @@ class _drawer_homeState extends State<drawer_home> {
                              signout();
                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => login()), (route) => false);
                            }
+                        ),
+                           ListTile(
+                          leading: Icon(Icons.restore),
+                          title: Text("Reset password" , style: TextStyle(fontSize: 15 , color: Color.fromARGB(179, 60, 51, 51)),),
+                           onTap: () async {
+                            Navigator.pop(context);
+                            var email = _auth.currentUser?.email;
+                            reset_dialog();
+                            
+                            
+                           }
                         )
                       ],
                     ),
@@ -215,4 +226,40 @@ class _drawer_homeState extends State<drawer_home> {
     );
    
   }
+
+  reset_dialog(){
+    showDialog(
+      context: context, 
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text("Reset Password !!"),
+          content: Text("Press 'OK' And Check your email to reset your password "),
+          actions: [
+            TextButton(
+              onPressed:() {
+                Navigator.pop(context);
+                
+              }, 
+              child: TextButton(
+                child: Text("OK"),
+                onPressed: () async {
+                  var email = _auth.currentUser!.email;
+                  await _auth.sendPasswordResetEmail(email: email!).then((value) {
+                    Navigator.pop(context);
+                  });
+                  
+                },
+              )
+            )
+          ],
+          actionsAlignment: MainAxisAlignment.center,
+          icon: Icon(Icons.email),
+
+        );
+        
+      },
+    );
+  }
+
 }

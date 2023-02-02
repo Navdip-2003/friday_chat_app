@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:friday_chat_app/log/email_get.dart';
 import 'package:friday_chat_app/log/login.dart';
 import 'package:friday_chat_app/methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -206,12 +207,19 @@ class _registerState extends State<register> with SingleTickerProviderStateMixin
                            Navigator.push(context, MaterialPageRoute(builder: (context)=>login()));
                 
                         }, child: Text("SignIn")
-                      )
+                      ),
+                      
                       ],
                     ),
                   ),
                 ),
+              ),
+              TextButton(onPressed: (){
+                   Navigator.push(context, MaterialPageRoute(builder: (context)=>email_get()));
+              
+                }, child: Text("varifi")
               )
+
         
             ],
           ),

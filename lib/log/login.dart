@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -146,7 +148,9 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
                     print("login successful");
                     setState(() {
                       isloading = false;
-                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> navigation()), (route) => false);
+                      log("login done");
+                      print(user.emailVerified);
+                      // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> navigation()), (route) => false);
                     });
                   }else{
                     print("login is failed");

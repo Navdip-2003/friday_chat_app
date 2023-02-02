@@ -82,6 +82,7 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   connectivity_plus: ^3.0.2
 
+  # widget photo save 
   screenshot: ^1.3.0
 
   
@@ -153,6 +154,10 @@ flutter:
     - family: Paci
       fonts:
         - asset: asset/font/Paci.ttf
+
+    - family: ConFont
+      fonts:
+        - asset: asset/font/ConFont.ttf    
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #

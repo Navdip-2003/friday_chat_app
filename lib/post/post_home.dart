@@ -610,7 +610,14 @@ class _post_homeState extends State<post_home> with SingleTickerProviderStateMix
                                                             child: Row(
                                                               children: [
                                                                 CachedNetworkImage(
-                                                                  imageUrl: image!
+                                                                  imageUrl: image!,
+                                                                  imageBuilder: (context, imageProvider) {
+                                                                    return CircleAvatar(
+                                                                      radius: 15,
+                                                                      backgroundImage: imageProvider,
+
+                                                                    );
+                                                                  },
                                                                 ),
                                                                 // CircleAvatar(
                                                                 //   radius: 15,
