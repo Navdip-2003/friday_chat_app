@@ -85,6 +85,8 @@ dependencies:
   # widget photo save 
   screenshot: ^1.3.0
 
+  flutter_reaction_button: ^2.0.1+2
+
   
 
 
