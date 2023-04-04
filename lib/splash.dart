@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:friday_chat_app/log/login.dart';
+import 'package:friday_chat_app/methods.dart';
 import 'package:friday_chat_app/navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:friday_chat_app/variables.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class splash extends StatefulWidget {
   const splash({super.key});
@@ -16,22 +18,30 @@ class splash extends StatefulWidget {
 }
 
 class _splashState extends State<splash> {
+  void init() async{
+    SharedPreferences share = await SharedPreferences.getInstance();
+    var loc_path = share.getString("loc_path");
+    if(loc_path == "" ){
+      await Storage_create_folder();
+    }
+
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-     var use = FirebaseAuth.instance.currentUser;
+    var use = FirebaseAuth.instance.currentUser;
     if(use != null){
       suser();
       //print("current user is  : "+ ddata!["email"]);
     }
-     Timer(Duration(seconds: 3),(){
+    Timer(Duration(seconds: 3),(){
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
        use == null ? login() : navigation()
-     
-     ));
+      ));
      } ,
-     );
+    );
+    init();
     
   }
   @override

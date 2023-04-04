@@ -3,15 +3,19 @@
 
 
 import 'dart:developer';
-
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:friday_chat_app/home.dart';
 import 'package:friday_chat_app/log/login.dart';
 import 'package:friday_chat_app/variables.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -140,3 +144,86 @@ import 'package:gallery_saver/gallery_saver.dart';
       });
 
   }
+
+  Future<bool> request_permission(Permission permissions)async{
+    if(await permissions.isGranted){
+      return true;
+    }else{
+      var result = await permissions.request();
+      if(result == permissions.isGranted){
+        return true;
+      }else{
+        return false;
+      }
+    } 
+  }
+
+  var local_directory_path;
+
+  Future<void> Storage_create_folder() async{
+    SharedPreferences share = await SharedPreferences.getInstance();
+    Directory? directory;
+    try{
+      if(await request_permission(Permission.storage)){
+        directory = await getExternalStorageDirectory();
+        log("${directory!.path}");
+        String newpath = "";
+        print(directory.path.split("/"));
+
+        var split_file = directory.path.split("/");
+        ///storage/emulated/0//data/com.example.friday_chat_app/files
+
+        for(int i = 1 ;  i < split_file.length ; i++){
+          if(split_file[i] != "Android"){
+            newpath += "/" + split_file[i];
+          }else{
+            break;
+          }
+        }
+        newpath = newpath +"/FridayData";
+        directory = Directory(newpath);
+        log("new path is : ${newpath}");
+        local_directory_path = newpath;
+        share.setString("loc_path", newpath);
+
+        if(!await directory.exists()){
+          await directory.create(recursive: true);
+        }
+
+      }else{
+        Fluttertoast.showToast(msg: "Storage permission denied !!");
+      }
+
+      
+      
+    }catch(e){
+      print(e);
+
+    }
+  
+  }
+  
+  
+  Future<void> create_loc_directory() async{
+    SharedPreferences share = await SharedPreferences.getInstance();
+    String? loc_path = share.getString("loc_path");
+    if(loc_path == ""){
+      await Storage_create_folder();
+    }else{
+      await Directory(loc_path!).create(recursive: true).then((value) {
+        log("folder create Done!!");
+      });
+    }
+    
+    // if(!await Directory(loc_path!).exists()){
+    //   await Directory(loc_path).create(recursive: true);
+    //   return true;
+
+    // }else{
+    //   log("Directory not created exists!!");
+    //   return false;
+      
+    // }
+
+  }
+

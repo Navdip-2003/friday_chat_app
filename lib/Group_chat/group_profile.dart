@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friday_chat_app/Group_chat/screen_inprofile/change_subject.dart';
 import 'package:friday_chat_app/Group_chat/screen_inprofile/member_add.dart';
-import 'package:friday_chat_app/chatroom.dart';
+import 'package:friday_chat_app/chat_screen/chatroom.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/data_search.dart';
 import 'package:friday_chat_app/home_demo.dart';

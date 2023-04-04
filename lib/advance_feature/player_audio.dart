@@ -78,108 +78,116 @@ class _player_audioState extends State<player_audio> with SingleTickerProviderSt
           return true;
         },
         child: SafeArea(
-          top: true,
+         
           child: SingleChildScrollView(
             child: Container(
-              color: Color.fromARGB(255, 255, 255, 255),
-              padding: EdgeInsets.all(5),
-              child: Card(
-                color: Color.fromARGB(255, 34, 79, 95),
-                semanticContainer: true,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              height: size.height,
+              child: Center(
                 child: Container(
-                  width: size.width,
+                  color: Color.fromARGB(255, 255, 255, 255),
                   padding: EdgeInsets.all(5),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      BackButton(
-                        color: Colors.white,
-                        onPressed: () {
-                          _player.dispose();
-                          _player.release();
-                          _player.stop();
-                          Navigator.pop(context);              
-                        },
-                      ),
-                      Container(
-                        child: Lottie.asset("asset/music_player.json", width: size.width / 1 , height: size.height / 2.5)),
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        child: AutoSizeText(widget.link.split("/").last , 
-                        
-                          maxLines: 2, minFontSize: 15, maxFontSize: 30,overflow: TextOverflow.ellipsis, style: TextStyle(
-                          fontFamily: "SansFont",  color: Colors.white),
-                          textAlign: TextAlign.left, 
-                        ),
-                      ),
-                      Container(
-                        child: Slider(
-                          thumbColor: Colors.white,
-                          inactiveColor: Color.fromARGB(255, 255, 255, 255),
-                          activeColor: Color.fromARGB(255, 8, 198, 251),
-                          min: 0,
-                          max: duration!.inSeconds.toDouble(),
-                          value: position!.inSeconds.toDouble(), 
-                          onChanged: (value) async{
-                            final pos = Duration(seconds: value.toInt());
-                            await _player.seek(pos); 
-                            await _player.resume();
-                          }
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        child: Row(
-                          children: [
-                            Padding(padding: EdgeInsets.all(10)),
-                            AutoSizeText(format_time(position!) , 
-                              style: TextStyle(
-                                color: Colors.white
-                              ),
-                            ),
-                            Spacer(),
-                            AutoSizeText(format_time(duration!) , 
-                              style: TextStyle(
-                                color: Colors.white
-                              ),
-                            ),
-                            Padding(padding: EdgeInsets.all(10)),
-                
-                          ],
-                        ),
-                      ),
-                      Container(
-                       
-                        padding: EdgeInsets.all(10),
-                        alignment: Alignment.center,
-                        child: InkWell(
-                          onTap: () async{
-                            try{
-                              if(is_play){
-                                _controller.stop();
-                                //_controller.forward();
-                                await _player.pause();
-                              }else{
-                                await _player.play(UrlSource(widget.link));
-                              }
-                            }catch(e){
-                              print(e);
-
-                            }
-                          },
-                          child: Icon(is_play ? Icons.pause : Icons.play_circle , size: 50, color: Colors.white,)
-                        ),
-                      ),
+                  child: Card(
+                    
+                    color: Color.fromARGB(255, 34, 79, 95),
+                    semanticContainer: true,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: Container(
                       
-                    ],
+                      width: size.width,
+                      padding: EdgeInsets.all(5),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        //mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          BackButton(
+                            color: Colors.white,
+                            onPressed: () {
+                              _player.dispose();
+                              _player.release();
+                              _player.stop();
+                              Navigator.pop(context);              
+                            },
+                          ),
+                          Container(
+                            child: Lottie.asset("asset/music_player.json", width: size.width / 1 , height: size.height / 2.5)),
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            child: AutoSizeText(widget.link.split("/").last , 
+                            
+                              maxLines: 2, minFontSize: 15, maxFontSize: 30,overflow: TextOverflow.ellipsis, style: TextStyle(
+                              fontFamily: "SansFont",  color: Colors.white),
+                              textAlign: TextAlign.left, 
+                            ),
+                          ),
+                          Container(
+                            child: Slider(
+                              thumbColor: Colors.white,
+                              inactiveColor: Color.fromARGB(255, 255, 255, 255),
+                              activeColor: Color.fromARGB(255, 8, 198, 251),
+                              min: 0,
+                              max: duration!.inSeconds.toDouble(),
+                              value: position!.inSeconds.toDouble(), 
+                              onChanged: (value) async{
+                                final pos = Duration(seconds: value.toInt());
+                                await _player.seek(pos); 
+                                await _player.resume();
+                              }
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            child: Row(
+                              children: [
+                                Padding(padding: EdgeInsets.all(10)),
+                                AutoSizeText(format_time(position!) , 
+                                  style: TextStyle(
+                                    color: Colors.white
+                                  ),
+                                ),
+                                Spacer(),
+                                AutoSizeText(format_time(duration!) , 
+                                  style: TextStyle(
+                                    color: Colors.white
+                                  ),
+                                ),
+                                Padding(padding: EdgeInsets.all(10)),
+                    
+                              ],
+                            ),
+                          ),
+                          Container(
+                           
+                            padding: EdgeInsets.all(10),
+                            alignment: Alignment.center,
+                            child: InkWell(
+                              onTap: () async{
+                                try{
+                                  if(is_play){
+                                    _controller.stop();
+                                    //_controller.forward();
+                                    await _player.pause();
+                                  }else{
+                                    await _player.play(UrlSource(widget.link));
+                                  }
+                                }catch(e){
+                                  print(e);
+              
+                                }
+                              },
+                              child: Icon(is_play ? Icons.pause : Icons.play_circle , size: 50, color: Colors.white,)
+                            ),
+                          ),
+                          
+                        ],
+                      ),
+                    ),
+                    
                   ),
+                    
                 ),
-                
               ),
-                
             ),
           ) 
         ),

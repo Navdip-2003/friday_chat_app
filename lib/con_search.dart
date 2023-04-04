@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:friday_chat_app/chatroom.dart';
+import 'package:friday_chat_app/chat_screen/chatroom.dart';
 import 'package:friday_chat_app/variables.dart';
 class con_search extends SearchDelegate<String>{
   con_search(int tab_index);

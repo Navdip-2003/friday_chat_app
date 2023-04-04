@@ -129,6 +129,6 @@ String format_time(Duration duration){
   ].join(':');
 }
 
-var local_directory_path = "/storage/emulated/0/FridayData";
+//var local_directory_path = "/storage/emulated/0/FridayData";
   
 

@@ -4,7 +4,7 @@ import 'package:friday_chat_app/Group_chat/data.dart';
 
 import 'package:friday_chat_app/Group_chat/chatroom_group.dart';
 import 'package:friday_chat_app/Group_chat/home_group.dart';
-import 'package:friday_chat_app/chatroom.dart';
+import 'package:friday_chat_app/chat_screen/chatroom.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/demo2.dart';
 import 'package:friday_chat_app/dispaly_homepage.dart';
@@ -18,7 +18,7 @@ import 'package:friday_chat_app/post/post_home.dart';
 import 'package:friday_chat_app/shimmer.dart';
 import 'package:friday_chat_app/single_chat.dart';
 import 'package:friday_chat_app/splash.dart';
-import 'package:friday_chat_app/tab/chats.dart';
+import 'package:friday_chat_app/chat_screen/chats.dart';
 import 'package:friday_chat_app/try.dart';
 import 'package:friday_chat_app/variables.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -6,7 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:friday_chat_app/chatroom.dart';
+import 'package:friday_chat_app/chat_screen/chatroom.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/variables.dart';
 

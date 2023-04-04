@@ -196,7 +196,7 @@ class _group_chatroomState extends State<group_chatroom> {
                                   color: Color.fromARGB(221, 7, 48, 19),
                                   width: 1,
                                 )),
-                            border: OutlineInputBorder(borderSide: BorderSide(strokeAlign: StrokeAlign.inside), borderRadius: BorderRadius.circular(20))),
+                            border: OutlineInputBorder(borderSide: BorderSide(strokeAlign: BorderSide.strokeAlignInside), borderRadius: BorderRadius.circular(20))),
                       ),
                     ),
                   ),

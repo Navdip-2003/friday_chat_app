@@ -7,13 +7,14 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:friday_chat_app/advance_feature/audio_player.dart';
 import 'package:friday_chat_app/advance_feature/whether_city.dart';
+import 'package:friday_chat_app/chat_screen/new_chatdesign.dart';
+import 'package:friday_chat_app/chat_screen/type_screen.dart';
 import 'package:friday_chat_app/contact.dart';
 import 'package:friday_chat_app/dispaly_homepage.dart';
 import 'package:friday_chat_app/home.dart';
 import 'package:friday_chat_app/image_compressed.dart';
 import 'package:friday_chat_app/log/email_varified.dart';
 import 'package:friday_chat_app/navi_item/profile_user.dart';
-import 'package:friday_chat_app/navi_item/user_profile.dart';
 import 'package:friday_chat_app/only_try/model_class.dart';
 import 'package:friday_chat_app/overlay_image.dart';
 import 'package:friday_chat_app/pagination.dart';
@@ -73,7 +74,8 @@ class _navigationState extends State<navigation> with WidgetsBindingObserver {
  // ratio_image(),
    // whether_city(),
    // audio_player(),
-   model_class(),
+   //type_screen(chatroomid: "OPElQEDKCpZsFMu9RL37O5Gswzu2Ikw2p5ry0WceDSK606Dzz6VmtR22"),
+    new_chatdesign(),
 
     post_home(),
     profile_user()

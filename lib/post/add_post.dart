@@ -297,7 +297,7 @@ class _add_postState extends State<add_post> with SingleTickerProviderStateMixin
                                             color: Color.fromARGB(221, 7, 48, 19),
                                             width: 1,
                                           )),
-                                      border: OutlineInputBorder(borderSide: BorderSide(strokeAlign: StrokeAlign.inside), borderRadius: BorderRadius.circular(15))),
+                                      border: OutlineInputBorder(borderSide: BorderSide(strokeAlign: BorderSide.strokeAlignInside), borderRadius: BorderRadius.circular(15))),
                                 ),
                               )
                             ],

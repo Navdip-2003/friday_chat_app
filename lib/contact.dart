@@ -4,13 +4,13 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:friday_chat_app/Group_chat/home_group.dart';
-import 'package:friday_chat_app/chatroom.dart';
+import 'package:friday_chat_app/chat_screen/chatroom.dart';
 import 'package:friday_chat_app/con_search.dart';
 import 'package:friday_chat_app/data_search.dart';
 import 'package:friday_chat_app/dispaly_homepage.dart';
 import 'package:friday_chat_app/drawer_home.dart';
 import 'package:friday_chat_app/navigation.dart';
-import 'package:friday_chat_app/tab/chats.dart';
+import 'package:friday_chat_app/chat_screen/chats.dart';
 import 'package:friday_chat_app/variables.dart';
 
 class contact extends StatefulWidget {
